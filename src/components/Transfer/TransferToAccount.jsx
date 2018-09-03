@@ -5,14 +5,10 @@ const Option = Select.Option;
 const FormItem = Form.Item;
 class TransferInput extends React.Component{
     state={
-        method:'GBC',
         isforbidden:false,
         values:{}
     }
     componentDidMount(){
-        this.setState({
-            method:this.props.method
-        })
         this.props.form.setFieldsValue({
             from:this.props.userName,
             memo:''
@@ -23,117 +19,83 @@ class TransferInput extends React.Component{
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
           if (!err) {
-            values.amount=`${Number(values.amount).toFixed(3)} ${this.state.method}`
-            this.setState({
-                isforbidden:true,
-                values
-            })
+            values.amount=`${Number(values.amount).toFixed(3)} GBC`
+            this.props.Transfer(values)
+                .then(res=>{
+                    this.props.onCancel()
+                })
+                .catch(err=>{
+                    const openNotification = () => {
+                        notification.open({
+                        message: '转账',
+                        description: '转账失败',
+                        });
+                    }
+                    openNotification()
+                })
           }
         });
     }
     // 点击余额操作
     setAccountValue = () =>{
-        const gameStarnum=this.props.balance.split(' ')[0]
-        const sbdNum = this.props.gbd_balance.split(' ')[0]
+        const gbcNum=this.props.balance.split(' ')[0]
         this.props.form.setFieldsValue({
-            amount: this.state.method=='GBC'?gameStarnum:sbdNum
+            amount:gbcNum
         });
     }  
     //验证转账数量是否足够
     validateCount(rule, value, callback){
-        const gameStarnum=this.props.balance.split(' ')[0]
-        const sbdNum = this.props.gbd_balance.split(' ')[0]
-        if(!value || value==0){
-            callback('请输入转账数量')
-        }
-        else if(this.state.method=='GBC'&& Number(gameStarnum)<Number(value)){
-            callback('可用余额不足1')
-        }else if(this.state.method=='GBD'&&sbdNum<value){
-            callback('可用余额不足')
+        const Maxgbc=this.props.balance.split(' ')[0]
+        if((Maxgbc-value)<=0){
+            callback('余额不足')
         }else{
             callback()
         }
     }
-    // 返回上一步
-    returnStep=()=>{
-        this.setState({
-            isforbidden:false
-        })
-    }
-    // 转账发起
-    Transfer=()=>{    
-        this.props.Transfer(this.state.values)
-        .then(res=>{
-            this.props.onCancel()
-        })
-        .catch(err=>{
-            const openNotification = () => {
-                notification.open({
-                  message: '转账',
-                  description: '转账失败',
-                });
-            }
-            openNotification()
-        })
-    }
     render(){
-        const { getFieldDecorator,  } = this.props.form;
-        const {method,isforbidden}=this.state
-        const selectAfter = (
-            <Select defaultValue={method} style={{ width: 80 }}>
-              <Option value="GBC" onClick={()=>this.setState({method:'GBC'})}>GBC</Option>
-              {/* <Option value="GBD" onClick={()=>this.setState({method:'GBD'})}>GBD</Option> */}
-            </Select>
-        );
+        const { getFieldDecorator } = this.props.form;
         return(
             <Form onSubmit={this.handleSubmit} className="login-form">
                  <FormItem>
                 {getFieldDecorator('from', {
                     rules: [{ required: true, message: '请输入要转入的账户' }],
                 })(
-                    <Input addonBefore="从 " disabled />
+                    <Input disabled addonBefore="转账人"  />
                 )}
                 </FormItem>
                 <FormItem>
                 {getFieldDecorator('to', {
                     rules: [{ required: true, message: '请输入要转入的账户' }],
                 })(
-                    <Input addonBefore="到 " disabled={isforbidden} />
+                    <Input addonBefore="收款人"  autoComplete="off" placeholder="收款账号" />
                 )}
                 </FormItem>
                 <FormItem>
                     {getFieldDecorator('amount', {
                     rules: [{ required: true,type:'number' ,validator:(rule, value, callback)=>this.validateCount(rule, value, callback) }],
                 })(
-                    <Input addonBefore='数'  disabled={isforbidden} type='number' addonAfter={selectAfter} placeholder='数量'/>
+                    <Input addonBefore='金额'  type='number' addonAfter="GBC" placeholder='数量'/>
                 )}
-                 <p style={{paddingLeft:"40px"}}>
-                          <Button style={{border:'0'}} onClick={this.setAccountValue}  size={'small'}>余额</Button>
-                        </p>
+                <p style={{paddingLeft:"40px"}}>
+                  <Button style={{border:'0'}} onClick={this.setAccountValue}  size={'small'}>余额</Button>
+                </p>
                 </FormItem>
                 <FormItem>
                     {getFieldDecorator('memo', {
                     rules: [{ required: false, message: '' }],
                 })(
-                    <Input addonBefore="备注"  disabled={isforbidden} placeholder='备注' />
+                    <Input addonBefore="备注" placeholder='备注' />
                 )}
                 </FormItem>
-                {
-                    !isforbidden? <Button htmlType="submit" className="login-form-button">
-                        下一步
-                 </Button>:null
-                }
-                {
-                    isforbidden?<div>
-                        <Button onClick={this.Transfer}   type="primary">
-                            确认
-                         </Button>
-                        <Button onClick={this.returnStep} style={{marginLeft:'20px'}} type="dashed" htmlType="submit" className="login-form-button">
-                        返回
+                <FormItem>
+                 <Button 
+                    htmlType="submit"
+                    style={{background:"#ff605f",borderColor:"#ff605f"}}   
+                    type="primary"
+                    >
+                        确认
                     </Button>
-                    </div>
-                  :null
-                }
+                </FormItem>
           </Form>
         )
     }

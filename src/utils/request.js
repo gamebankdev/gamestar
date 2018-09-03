@@ -29,12 +29,15 @@ export default function request(url, options) {
         return new Promise((resolve,reject)=>{
           fetch(`${config.gameBankServer}${url}`, {
             method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+               mode: 'cors',
+            },
             body:JSON.stringify(options.payload)
           })
           .then(checkStatus)
           .then(parseJSON)
           .then(res=>{
-
             resolve(res)
           })
           .catch(err=>{
@@ -56,4 +59,3 @@ export default function request(url, options) {
      
     }
 }
-

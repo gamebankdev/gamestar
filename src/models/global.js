@@ -2,14 +2,14 @@
 export default {
 
     namespace: 'global',
-  
     state: {
         showPopupLogin:false,
         doingTask:undefined,
-        doingParams:undefined
+        doingParams:undefined,
+
     },
     effects: {
-      *changeShowPopupLogin({ payload }, { call, put ,select}) {
+      *showSignModal({ payload }, { call, put ,select}) {
         const nowPopupLogin = yield select(state=>state.global.showPopupLogin)
         yield put({ 
             type: 'save',
@@ -26,7 +26,8 @@ export default {
             errorMessage:message
           }
         })
-      }
+      },
+   
     },
     reducers: {
       save(state, action) {

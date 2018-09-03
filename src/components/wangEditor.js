@@ -1,34 +1,54 @@
 import React from 'react'
 import E from 'wangeditor'
 import { Button,message } from 'antd';
+import styled from 'styled-components'
+const Post_menu  = styled.div`
+    width:100% ;
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    padding:20px 0 30px 0;
+`
+const EditorArea = styled.div`
+    width:100%;
+    border:1px solid #b9b9b9;
+    height: 88px;
+    border-radius:5px;
+`
+const Post_posts_comment =  styled.button`
+    width: 120px;
+    height: 40px;
+    border:0;
+    cursor:pointer;
+    background-color:#ff605f;
+    border-radius:5px;
+    font-family:'SimHei';
+    font-size:18px;
+    color:#fff;
+`
+const Post_comment_comment= styled.button`
+     width: 120px;
+    height: 40px;
+    border:0;
+    cursor:pointer;
+    background-color:#6fafe5;
+    border-radius:5px;
+    font-family:'SimHei';
+    font-size:18px;
+    color:#fff;
+`
 class WangEditor extends React.Component{
     constructor(){
         super()
     }
     componentDidMount(){
-        this.editor = new E(`#div${this.props.id}1`, `#div${this.props.id}2`)  
+        const {id}=this.props;
+        this.editor = new E(`#toolbar${id}`,`#EditorArea${id}`)  
         this.editor.customConfig.onchangeTimeout = 1000
         this.editor.customConfig.menus = [
-            'head',  // 标题
-            'bold',  // 粗体
-            'fontSize',  // 字号
-            'fontName',  // 字体
-            'italic',  // 斜体
-            'underline',  // 下划线
-            'strikeThrough',  // 删除线
-            // 'foreColor',  // 文字颜色
-            // 'backColor',  // 背景颜色
             'link',  // 插入链接
-            'list',  // 列表
-            'justify',  // 对齐方式
-            'quote',  // 引用
             'emoticon',  // 表情
             'image',  // 插入图片
-            'table',  // 表格
-            // 'video',  // 插入视频
-            'code',  // 插入代码
-            'undo',  // 撤销
-            'redo'  // 重复
         ]
         this.editor.customConfig.uploadImgServer = `http://127.0.0.1:4000/v1/${this.props.userName}/uoload`
         this.editor.customConfig.uploadImgMaxSize = 3 * 1024 * 1024
@@ -38,24 +58,36 @@ class WangEditor extends React.Component{
     }
     postComment(){
       const htmlCotent = this.editor.txt.html()   
-      const txtCotent = this.editor.txt.text()   
+      const txtCotent = this.editor.txt.text() 
         if(txtCotent){
-            this.props.postComemnt(htmlCotent)
+            const Initialcontent = this.props.Initialcontent
+            let willPrependContent;
+            if(Initialcontent){
+                willPrependContent = `<p>${Initialcontent}:</p>${htmlCotent}`
+            }else{
+                willPrependContent = htmlCotent
+            }
+            this.props.postComemnt(willPrependContent,this.props.permlink);
+            this.editor.txt.clear()
         }else{
             message.warning('请输入评论内容');
         }
     }
     render(){
-        const {show}=this.props;
-        return(
-            <div id={this.props.id}>
-                <div id={`div${this.props.id}1`} className="toolbar">
+        const {id,replay}=this.props;
+        return[
+            <EditorArea id={`EditorArea${id}`} className="text" placeholder="1"></EditorArea>,
+            <Post_menu>
+                <div id={`toolbar${id}`} className="toolbar">
                 </div>
-                <div id={`div${this.props.id}2`} className="text" style={{color:'#fff'}}></div>
-                <Button type="primary"  size='small' onClick={()=>this.postComment()}>发布</Button>
-                <Button size='small' onClick={()=>this.props.changeShow(false)}>取消</Button>
-            </div>
-        )
+                {
+                    replay=='posts'? <Post_posts_comment onClick={()=>this.postComment()}>发布</Post_posts_comment>
+                    : <Post_comment_comment onClick={()=>this.postComment()}>发布</Post_comment_comment>
+                }
+            </Post_menu>
+
+          
+        ]
     }
 }
 export default WangEditor

@@ -3,23 +3,34 @@ import gameStar from '../utils/gameBank'
 export default {
     namespace:'accounts',
     state:{
-        allPost:{
+        Posts:{
             content:{},
-            
         },
-        allComment:{
+        Comments:{
             content:{}
         },
-        allReplays:{
+        messages:{
             content:{}
         },
+
         userReputation:0,
-        userState:{},
         FollowCounts:{
             following_count:0,
             follower_count:0
         },
-        userAccounts:{},
+        
+        userAccounts:{
+            active:{
+                key_auths:[]
+            },
+            owner:{
+                key_auths:[]
+            },
+            posting:{
+                key_auths:[]
+            },
+            memo_key:""
+        },
         Reward:{
             accounts:{
                 1:'curation_rewards'
@@ -35,14 +46,14 @@ export default {
             yield put({
                 type:'save',
                 payload:{
-                    allPost:allPost
+                    Posts:allPost
                 }
             })
         },
-        *accountComment({path},{call,put}){
+        *accountComment({userName},{call,put}){
             const allComment = yield call(fetchUrl,'api/getState',{
                 method:'POST',
-                payload:[`/@${path}/comments`]
+                payload:[`/@${userName}/comments`]
             })
             const arr = Object.keys( allComment.content)
             arr.forEach((item,index)=>{
@@ -52,7 +63,7 @@ export default {
             yield put({
                 type:'save',
                 payload:{
-                    allComment:allComment
+                    Comments:allComment
                 }
             })
         },
@@ -69,7 +80,7 @@ export default {
             yield put({
                 type:'save',
                 payload:{
-                    allReplays:allReplays
+                    messages:allReplays
                 }
             })
         },
@@ -80,7 +91,9 @@ export default {
             payload:[[payload]]
         })
            //计算声望
+
         const reputation =gameStar.formatter.reputation(userAccounts[0].reputation)
+
         const FollowCounts = yield call(fetchUrl,'api/getFollowCount',{
             method:'POST',
             payload:[payload]
@@ -104,7 +117,6 @@ export default {
                 payload:{
                     Reward:result
                 }
-
             })
         }
     },

@@ -7,26 +7,31 @@ const Container = styled.div`
     justify-content:space-between;
     align-items:center;
     color:#808891;
-    padding-bottom:30px;
+    padding:20px 0;
     box-sizing:border-box;
 `
-const UserKeys= styled.div`
-    width:100%;
+const Key_code_text= styled.div`
+    display:flex;
+    align-items:center;
+    font-family:"SimHei"
+`
+const Key_index_Container = styled.div`
+    padding:20px 0;
+    box-sizing:border-box;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    i{
+        font-size:40px;
+    }
 `
 class Permissions extends React.Component{
     constructor(props){
         super(props)
         this.state={
             visible:false,
-            posting:{
-                showPostingPub:true,
-            },
-            active:{
-                showActivePub:true,
-            },
-            memo:{
-                showMenoPub:true,
-            }
+            showPostingPub:true,
+            showActivePub:true,
         }
     }
     showCode(value){
@@ -47,90 +52,93 @@ class Permissions extends React.Component{
                 showActivePub:!this.state.showActivePub
             })
         }
-        if(value=='memo'){
-            this.setState({
-                showMenoPub:!this.state.showMenoPub
-            })
-        }
     }
-    render(){
-        const {showPostingPub,showActivePub,showMenoPub}=this.state
-       
-        const postingPubKey=this.props.posting.key_auths[0][0]
-        const ActivePubKey = this.props.active.key_auths[0][0];
-        const OwnerKey=  this.props.owner.key_auths[0][0];
-        const memoKey = this.props.memo_key;
-        
+    render(){       
+        const {ActivePubKey,postingPubKey,ownerPubKey,memoPubkey,loginUserMeta} = this.props
+        const {showPostingPub,showActivePub} = this.state
         return(
-            <UserKeys style={{height:'700px'}}>
-            <Modal
-                title="Basic Modal"
-                footer={null}
-                visible={this.state.visible}
-                >
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-            </Modal>
-                <Container>
+            <div>
+            <Key_index_Container>
                     <div>
-                        <label htmlFor="" style={{color:"#1890ff"}}>发帖</label>
-                        <div>
-                            <img onClick={()=>this.showCode('postTingKey')} src={require('../assets/code.png')} alt=""/>
-                            <span>{postingPubKey}</span>
-                        </div>
-                        <p>Posting Key用于发帖和投票。它应与Active Key和Owner Key区分使用。</p>
+                      <h3>发帖</h3>
+                      <Key_code_text>
+                        <Icon style={{fontSize:"40px"}} type="qrcode" />
+                        <span>{showPostingPub?postingPubKey.key_auths[0]:loginUserMeta.privePostingWif}</span>
+                      </Key_code_text>
+                      <p>Posting Key用于发帖和投票。它应与Active Key和Owner Key区分使用。</p>
                     </div>
                     <div>   
-                        <Button type="primary"  onClick={()=>{this.showPri('posting')}} ghost>显示私钥</Button>
+                      <Button 
+                        type="primary"
+                        onClick={()=>{this.showPri('posting')}} ghost>
+                       {showPostingPub?'显示私钥':'显示公钥'} 
+                      </Button>
                     </div>
-                </Container>
-                <Container>
-                    <div>
-                        <label htmlFor="" style={{color:"#1890ff"}}>活跃</label>
+                </Key_index_Container>
+                <Key_index_Container>
                         <div>
-                            <img onClick={()=>this.showCode('actvieKey')} src={require('../assets/code.png')} alt=""/>
-                            <span>{ActivePubKey}</span>
+                            <h3>活跃</h3>
+                            <Key_code_text>
+                              <Icon type="qrcode" />
+                              <span>{showActivePub?ActivePubKey.key_auths[0]:loginUserMeta.activePriWif}</span>
+                            </Key_code_text>
+                            <p>Active Key用于转帐和在内部市场下单。</p>
                         </div>
-                        <p>Active Key用于转帐和在内部市场下单。</p>
-                    </div>
-                    <div>   
-                        <Button type="primary" onClick={()=>{this.showPri('active')}} ghost>显示私钥</Button>
-                    </div>
-                </Container>
-                <Container>
+                        <div>   
+                        {
+                            !loginUserMeta.activePriWif?
+                            <Button 
+                              onClick={()=>this.props.dispatch({type:"global/showSignModal"})} 
+                              type="primary" 
+                              ghost  
+                            >
+                              登陆显示
+                            </Button>
+                            :
+                            showActivePub?
+                            <Button type="primary" onClick={()=>{this.showPri('active')}} ghost>显示私钥</Button>
+                            :<Button type="primary" onClick={()=>{this.showPri('active')}} ghost>显示公钥</Button>
+                        }
+                        </div>
+                </Key_index_Container>
+                <Key_index_Container>
                     <div>
-                        <label htmlFor="" style={{color:"#1890ff"}}>拥有者</label>
-                        <div>
-                            <img onClick={()=>this.showCode('ownerKey')} src={require('../assets/code.png')} alt=""/>
-                            <span>{OwnerKey}</span>
+                      <h3>拥有者</h3>
+                          <Key_code_text>
+                              <Icon type="qrcode" />
+                              <span>{ownerPubKey.key_auths[0]}</span>
+                            </Key_code_text>
+                            <p>Owner Key是帐户的主密钥，用于更改其它密钥。</p>
+                            <p>Owner Key的私钥或密码应尽可能保持离线。</p>
                         </div>
-                        <p>Owner Key是帐户的主密钥，用于更改其它密钥。</p>
-                        <p>Owner Key的私钥或密码应尽可能保持离线。</p>
-                    </div>
-                </Container>
-                <Container>
-                    <div>
-                        <label htmlFor="" style={{color:"#1890ff"}}>备注</label>
+                </Key_index_Container>
+                <Key_index_Container>
                         <div>
-                            <img onClick={()=>this.showCode('memoKey')} src={require('../assets/code.png')} alt=""/>
-                            <span>{memoKey}</span>
+                            <h3>备注</h3>
+                            <Key_code_text>
+                              <Icon type="qrcode" />
+                              <span>{memoPubkey}</span>
+                            </Key_code_text>
+                            <p>Memo Key用于创建和读取备注。</p>
                         </div>
-                        <p>Memo Key用于创建和读取备注。</p>
-                    </div>
-                </Container>
-            </UserKeys>
+                </Key_index_Container>
+            </div>
         )
     }
 }
-const mapStateToProps = (state, ownProps) => {
-    return {...state.walet.userState}
-}
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapStateToProps = (state) => {
+    //账户公钥
+    const {active,memo_key,owner,posting} = state.accounts.userAccounts;
+    //账户私钥
+    const {loginUserMeta} =state.users
     return {
-        dispatch1: () => {
-            dispatch()
-        }
+        ActivePubKey:active,
+        ownerPubKey:owner,
+        postingPubKey:posting,
+        memoPubkey:memo_key,
+        loginUserMeta:loginUserMeta,
     }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(Permissions) 
+
+export default connect(mapStateToProps)(Permissions) 
+

@@ -1,7 +1,5 @@
 import React,{Component} from 'react'
 import styled from 'styled-components'
-import backImg  from '../assets/cluster_bg_2.png'
-import Topic from '../components/Topic'
 import { Form, Icon, Input, Button, Checkbox } from 'antd';
 import { connect } from 'dva';
 
@@ -9,45 +7,49 @@ const FormItem = Form.Item;
 
 const Container = styled.div`
     width:100%;
-    min-height:815px;
-    background: #1b2838 url(${backImg}) no-repeat fixed center;
+    height: calc(100% - 280px);
+    background:#fff;
 `
-const Rightcol= styled.div`
-    width:30%;
-    padding-left:20px;
-    padding-top:16px;
-    background-color:rgba(0,0,0,0.2);
-    color:#c6d4df;
-    font-size:12px;
-    line-height:24px;
-`
-const Leftcol = styled.div`
-        width:calc(68% - 1px);
-        background-color:rgba(0,0,0,0.2);
-        display:flex;
-        justify-content:space-between;
-        padding-top:20px;
-        color:#c6d4df;
-        font-size:12px;
-`
-const Loginbox_left =  styled.div`
-    width: 50%;
-    padding-left:20px;
-    padding-right:20px;
-`
-const Loginbox_Right = styled.div`
-    width: 50%;
-    padding-left:20px;
-    padding-right:20px;
+const Login_Container_content= styled.div`
+    width: 980px;
+    height:100% ;
+    padding-top:30px;
     box-sizing:border-box;
-    font-size:12px;
+    background:#f8f8f8;
+    margin:0 auto;
 `
+const Login_title = styled.h1`
+    color:#f85352;
+    width:980px;
+    margin:0 auto;
+    padding:20px 0;
+    box-sizing:border-box;
+`
+const Login_form= styled.div`
+    width:400px ;
+    margin:0 auto;
+`
+const formItemLayout = {
+    labelCol: {
+      xs: { span: 6 },
+      sm: { span: 6 },
+    },
+    wrapperCol: {
+      xs: { span: 6 },
+      sm: { span: 16 },
+    },
+  };
+
 class Login extends Component{
     constructor(props){
         super(props)
         this.state={
             loading:false
         }
+    }
+    checkUserName=(rule, value, callback)=>{
+        this.props.checkuser(value)
+        callback()
     }
     handleSubmit = (e) => {
         e.preventDefault();
@@ -58,63 +60,59 @@ class Login extends Component{
         });
       }
     render(){
-        const { getFieldDecorator } = this.props.form;
-
-    return (
+        const { getFieldDecorator,setFields } = this.props.form;
+        return (
         <Container>
-            <div style={{width:960,margin:'0 auto',paddingTop:50}}>
-              <Topic />
-              <div style={{display:'flex',justifyContent:'space-between',marginTop:'30px'}}>
-                  <Leftcol>
-                      <Loginbox_left>
-                          <h2 style={{color:'#ffffff'}}>登陆</h2>
-                          <p>到现有的 gameBank 帐户</p>
-                          <Form onSubmit={this.handleSubmit} className="login-form" >
-                            <FormItem>
-                            {getFieldDecorator('userName', {
-                                rules: [{ required: true, message: 'Please input your username!'}],
-                            })(
-                                <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="gameBank 帐户名称" />
-                            )}
-                            </FormItem>
-                            <FormItem>
-                            {getFieldDecorator('password', {
-                                rules: [{ required: true, message: 'Please input your Password!' }],
-                            })(
-                                <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="密码" />
-                            )}
-                            </FormItem>
-                            <FormItem>
-                            <Button loading={this.state.loading}  htmlType="submit" style={{background:' rgba( 103, 193, 245, 0.2 )',border:'none'}}>
-                                登  录
-                            </Button>
-                            </FormItem>
-                        </Form>
-                    </Loginbox_left>
-                      <div style={{width:1,background:'#264959',height:210}}></div>
-                      <Loginbox_Right>
-                          <h2 style={{color:'#ffffff'}}>创建</h2>
-                          <p>一个新的免费帐户</p>
-                          <p>
-							欢迎免费加入及轻松使用。继续创建 gameBank 帐户并获取 gameBank - 适合 PC 和 Mac 玩家的前沿数字解决方案。						</p>
-                            <Button  style={{background:' rgba( 103, 193, 245, 0.2 )',border:'none'}} >
-                                加入gameStar
-                            </Button>
-                      </Loginbox_Right>
-                  </Leftcol>
-                  <Rightcol>
-                    <h2 style={{color:'#67c1f5'}}>为什么加入 gameStar</h2>
-                    <ul>
-                        <li>购买和下载完整零售游戏</li>
-                        <li>加入 gameStar 社区</li>
-                        <li>游戏时与好友聊天</li>
-                        <li>在任何电脑上都能玩</li>
-                        <li>安排游戏、比赛或 LAN 聚会</li>
-                        <li>获取自动游戏更新以及更多！</li>
-                    </ul>
-                  </Rightcol>
-              </div>
-            </div>
+            <Login_title>登陆</Login_title>
+            <Login_Container_content>
+            <Login_form>
+                <Form onSubmit={this.handleSubmit} className="login-form">
+                <FormItem
+                  label="用户名:"
+                  {...formItemLayout}
+                >
+                    {getFieldDecorator('userName', {
+                        validateTrigger:'onBlur',
+                        rules: [{ required: true, message: '请输入用户名!',validator:this.checkUserName}],
+                    })(
+                    <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="gameBank 帐户名称" />
+                        )}
+                </FormItem>
+                <FormItem
+                  label="密码:"
+                  {...formItemLayout}
+                >
+                {getFieldDecorator('password', {
+                        rules: [{ required: true, message: '请输入密码!' }],
+                        })(
+                        <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="请输入posting或主密码" />
+                        )}
+                </FormItem>
+                <br/>
+                <FormItem
+                label=" "
+                colon={false}
+                {...formItemLayout}
+                >
+                    <Button 
+                      style={{
+                          width:"100%",
+                          height:"60px",
+                          lineHeight:"60px",
+                          borderRadius:"5px",
+                          background:"#f85352",
+                          color:"#fff",
+                          fontSize:"30px"
+                        }}
+                    loading={this.state.loading} 
+                    htmlType="submit">
+                         登  录
+                    </Button>
+                </FormItem>
+                </Form>
+            </Login_form>
+           
+            </Login_Container_content>
         </Container>
     )
     }
@@ -124,12 +122,16 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     return {
         dispatchLogin: (params) => {
             dispatch({type:'users/fetchLogin',payload:params})
+        },
+        checkuser:(userName)=>{
+            dispatch({
+                type:"users/checkUserName",
+                userName
+            })
         }
     }
 }
 const mapStateToProps = (state, ownProps) => {
-    return {
-        prop: state.users
-    }
+    return {...state.users}
 }
 export default connect(mapStateToProps,mapDispatchToProps)(WrappedNormalLoginForm)

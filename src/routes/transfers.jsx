@@ -1,126 +1,327 @@
-import cluster_bg_2 from '../assets/cluster_bg_2.png'
+import React from 'react'
 import {Link} from 'dva/router'
 import styled from 'styled-components'
-import React from 'react'
-import {  Route,Redirect, } from 'dva/router';
+import {Button ,Divider,Icon} from 'antd';
+import {  Route} from 'dva/router';
 import {connect} from 'dva'
-import { Menu, Dropdown, Icon } from 'antd';
+import ChangeAvterModal from '../components/Popup/ChangeAvterModal'
 import Walet from './walet'
 import PostList from './myPostListPage'
 import Comment from './MyCommentsPage'
 import MyLeaveMessage from './MyLeaveMessage'
-import curationRewards from './curationRewards.jsx'
-import authorRewards from './authorRewards'
+import fomatTime from '../utils/formatTime'
 const Container = styled.div`
     width: 100%;
-    background: #1b2838 url(${cluster_bg_2}) no-repeat fixed center;
+    background:#fff;
+    min-height:calc(100% - 280px);
     margin:0 auto;
-    min-height:800px;
-`
-const Pageheader = styled.h2`
-    color: #fff;
-    font-size:34px;
-    padding-top:24px;
+    padding-bottom:60px;
     box-sizing:border-box;
 `
-const LeftNave = styled.div`
-    width:100% ;
-    font-size:14px;
+const Person_center_title = styled.h1`
+    color:#f85352;
+    width:980px;
+    margin:0 auto;
+    padding:20px 0;
+    box-sizing:border-box;
+`
+const Container_content = styled.div`
+    width:980px;
+    margin:0 auto;
+    background:#f8f8f8;
     display:flex;
-    justify-content:space-between;
-    background:#2C3A45;
-    align-items:center;
-    div{
-        padding:10px;
-        color: #fff;
+    justify-content:flex-start;
+`
+const Person_meta_container = styled.div`
+    width:290px;
+    padding:10px;
+    box-sizing:border-box;
+    text-align:center;
+    box-sizing:border-box;
+    font-family:'SimHei'
+`
+const User_avter_container = styled.div`
+    width:120px;
+    height:120px;
+    margin:0 auto;
+    position:relative;
+    :hover div{
+        display:block;
+    }
+    img{
+        width:100%;
+        height:100%;
     }
 `
-const Voter= styled.span`
+const ChaneAvter=styled.div`
+    width:100%;
+    height:30px;
+    display:none;
+    line-height:30px;
+    background-color:rgba(0,0,0,0.5);
+    text-align:center;
+    color: #fff;
+    position:absolute;
+    bottom: 0;
+    left:0;
+   
+`
+const Person_userName = styled.p`
+    padding:20px 0;
+    font-size:20px;
+    color:#333;
+` 
+const Person_meta = styled.div`
+    display:flex;
+    margin-top:20px;
+    padding-bottom:20px;
+    justify-content:space-around;
+    text-align:center;
+    box-sizing:border-box;
+`
+const Folle_igore_container = styled.div`
+    display:flex;
+    justify-content:space-around;
+`
+const User_meta_comtainer = styled.div`
+    padding-top:10px;
+    padding-bottom:10px;
+    box-sizing:border-box;
+    background:#fff;
+`
+const My_button_container = styled.div`
+    padding:10px;
+    box-sizing:border-box;
+    background:#fff;
+    button{
+        width:100% ;
+        margin-top:20px;
+        box-sizing:border-box;
+    }
+`
+const Content_container= styled.div`
+    width:calc(100% - 290px) ;
+    border-left:1px solid #c6c6c6;
+    padding:30px 10px 40px 10px;
+    box-sizing:border-box;
+`
 
-    :hover{
-        color:#40a9ff
-    }
-`
 class Transfers extends React.Component{
-    componentDidMount(){
-        this.props.getUser()
+    constructor(props){
+ 
+        super(props)
+        this.state={
+            isFollw:false,
+            isShield:false,
+            visible:false
+        }
     }
-    render(){
-    const { userName,match,userReputation}=this.props
-    const {post_count,created} = this.props.userAccounts
-    const {follower_count,following_count} =this.props.FollowCounts
-    const ByUserName = match.params.userName
-    const menu = (
-        <Menu>
-          <Menu.Item key="0">
-            <Link  to={`/${ByUserName}/curation-rewards`} replace>投票奖励</Link>
-          </Menu.Item>  
-          <Menu.Item key="1">
-            <Link to={`/${ByUserName}/author-rewards`} replace>作者奖励</Link>
-          </Menu.Item>
-        </Menu>
-      );
-    return(
+    componentDidMount(){
+        this.props.getUser();
+    }
+    //关注
+    follow(author){
+        const {privePostingWif,userName}=this.props.loginUserMeta
+        let followReq = ["follow"]
+        followReq.push({follower: userName, following: author, what: ["blog"]})
+        const customJson = JSON.stringify(followReq)
+        this.props.postUserOper([privePostingWif, [], [userName], 'follow', customJson])
+    }   
+     //取消关注
+     canclefollow(author){
+        const {privePostingWif,userName}=this.props.loginUserMeta
+        let followReq = ["follow"]
+        followReq.push({follower: userName, following: author, what: []})
+        const customJson = JSON.stringify(followReq)
+        this.props.postUserOper([privePostingWif, [], [userName], 'follow', customJson])
+    }   
+    /**屏蔽*/
+    Shield=(author)=>{
+        const {privePostingWif,userName}=this.props.loginUserMeta
+        let followReq = ["follow"]
+        followReq.push({follower: userName, following: author, what: ["ignore"]})
+        const customJson = JSON.stringify(followReq)
+        this.props.postUserOper([privePostingWif, [], [userName], 'follow', customJson])
+    }
+    //取消屏蔽
+    cancleShield=(author)=>{
+        const {privePostingWif,userName}=this.props.loginUserMeta
+        let followReq = ["follow"]
+        followReq.push({follower: userName, following: author, what: []})
+        const customJson = JSON.stringify(followReq)
+        this.props.postUserOper([privePostingWif, [], [userName], 'follow', customJson])
+    }
+    componentWillReceiveProps(nextProps){
+ 
+        const {ignore,folloing,changeAvterSuccess} = nextProps
+        if(changeAvterSuccess){
+            this.setState({
+                visible:false
+            })
+        }else{
+            this.setState({
+                visible:true
+            })
+        }
+
+        if(folloing.length==0 &&ignore.length==0 ){
+            this.setState({
+            isFollw:false,
+            isShield:false
+            })
+        }  
+        if(ignore.length>0){
+            ignore.map(item=>{
+                if(item.follower == this.props.loginUserMeta.userName){
+                   this.setState({
+                        isShield:true,
+                        isFollw:false
+                   })
+                }
+            })
+        }
+        if(folloing.length>0){
+            folloing.map(item=>{
+                if(item.follower == this.props.loginUserMeta.userName){
+                    this.setState({
+                        isFollw:true,
+                        isShield:false
+                   })
+                }
+            })
+        }
+    }
+    render(){ 
+        const loginUserName = this.props.loginUserMeta.userName
+        const {userReputation} =this.props
+        const {isShield,isFollw,visible} = this.state
+        const {userName} = this.props.match.params
+        const {post_count,created,json_metadata} = this.props.userAccounts
+        const {follower_count,following_count} =this.props.FollowCounts
+       return(
         <Container>
-            <div style={{width:'960px',minHeight:'100%',margin:'0 auto'}}>
-                <div style={{textAlign:'center'}}>
-                    <Pageheader>{`${ByUserName}(${userReputation})`} 的帐户</Pageheader>
-                    <div style={{color:'rgb(128, 136, 145)',paddingLeft:'15px',boxSizing:'border-box'}}>
-                        <Voter>{follower_count}个关注者</Voter>  
-                        <span style={{border:"1px solid #fff",borderTop:'0',borderBottom:'0',margin:'0 10px',padding:'0 10px'}}>{post_count}个帖子</span> 
-                        <span>{following_count==0?'没有关注任何人':`关注${following_count}人`}</span>
-                        <p> 加入{created}</p>
-                    </div> 
-                </div>        
-                <LeftNave>
-                    <div style={{display:'flex',justifyContent:'flex-start'}}>
-                        <Menu mode='horizontal' style={{background:'#2C3A45',color:'#fff',border:'0'}}>
-                            <Menu.Item>
-                              <Link style={{color:'#fff'}} to={`/${ByUserName}/posting`} replace>发帖</Link>
-                            </Menu.Item>
-                            <Menu.Item>
-                              <Link style={{color:'#fff'}} to={`/${ByUserName}/comment`} replace>评论</Link>
-                            </Menu.Item>
-                            <Menu.Item>
-                              <Link style={{color:'#fff'}} to={`/${ByUserName}/leaveMessage`} replace>留言</Link>
-                            </Menu.Item>
-                            {/* <Menu.Item>
-                                <Dropdown overlay={menu} trigger={['hover']}>
-                                    <span> 奖励 <Icon type="down" /></span>
-                                </Dropdown>
-                            </Menu.Item> */}
-                            <Menu.Item>
-                                <Link style={{color:'#fff'}} to={`/${ByUserName}/walet`} replace>钱包</Link>
-                            </Menu.Item>
-                        </Menu>
+            <Person_center_title>个人中心</Person_center_title>
+            <ChangeAvterModal  visible={visible} cancel={()=>this.setState({visible:false})} />
+            <Container_content>
+                <Person_meta_container>
+                <div style={{padding:'10px'}}>
+                <User_meta_comtainer >
+                    <User_avter_container>
+                        {
+                            json_metadata?
+                              <img src={JSON.parse(json_metadata).profile.profile_image} alt=""/>
+                              :<img src={require('../assets/DefaultAvter.jpg')} alt=""/>
+                        }
+                        {
+                            userName==loginUserName? <ChaneAvter onClick={()=>this.setState({visible:true})}>
+                                        <Icon type="edit" />&nbsp;修改头像
+                                        </ChaneAvter>:null
+                        }
+                    </User_avter_container>
+
+                    <Person_userName>{`${userName}(${userReputation})`}</Person_userName>
+                    <span>{fomatTime(created)}加入</span>
+                    <Person_meta>
+                        <div>
+                            <span>{follower_count}</span>
+                            <br/>
+                            <span>关注</span> 
+                        </div>
+                        <div>
+                            <span>{post_count||0}</span>
+                            <br/>
+                            <span>帖子</span>
+                        </div>
+                        <div>
+                            <span>{following_count}</span>
+                            <br/>
+                            <span>被关注</span>
+                        </div>
+                    </Person_meta> 
+                    {
+                        loginUserName==userName
+                        ?null
+                        : <Folle_igore_container>
+                            { 
+                                isShield?
+                                [
+                                    <Button 
+                                      style={{background:"#ff6160",color:"#fff",border:"0"}}
+                                      disabled 
+                                      key={1} 
+                                      onClick={()=>this.follow(userName)}>
+                                      关注
+                                    </Button>,
+                                     <Button key={2} onClick={()=>this.cancleShield(userName)} >取消屏蔽</Button>
+                                ]
+                                :isFollw?
+                                [
+                                    <Button onClick={()=>this.canclefollow(userName)} key={3}>取消关注</Button>,<Button key={4} onClick={()=>this.Shield(userName)}>屏蔽</Button>
+                                ]:
+                                [
+                                    <Button  style={{background:"#ff6160",color:"#fff",border:"0"}} key={5} onClick={()=>this.follow(userName)}>关注</Button>,<Button key={6} onClick={()=>this.Shield(userName)}>屏蔽</Button>
+                                ]
+                            }
+                         </Folle_igore_container>
+                    } 
+                  
+                </User_meta_comtainer>
+                </div>
+                <Divider />
+                    <div style={{padding:'0 10px'}}>
+                        <My_button_container>
+                            <Link to={`/users/${userName}/posts`} replace>
+                            <Button>{loginUserName==userName?'我的发帖':'发帖'}</Button>
+                            </Link>
+                            <br/>
+                            <Link to={`/users/${userName}/messages`} replace>
+                            <Button>{loginUserName==userName?'我的消息':'消息'}</Button>
+                            </Link>
+                            <br/>
+                            <Link to={`/users/${userName}/comments`} replace>
+                            <Button>{loginUserName==userName?'我的评论':'评论'}</Button>
+                            </Link>
+                            <br/>
+                            <Link to={`/users/${userName}/walet`} replace>
+                            <Button>{loginUserName==userName?'我的钱包':'钱包'}</Button>
+                            </Link>
+                        </My_button_container>
                     </div>
-                </LeftNave>
-                    <div style={{paddingTop:'20px',height:'100%'}}>
-                      <Route path='/:userName/posting' component={PostList}/>
-                      <Route path='/:userName/comment' component={Comment}/>
-                      <Route path='/:userName/leaveMessage' component={MyLeaveMessage}/>
-                      <Route path='/:userName/walet' component={Walet}/>
-                      <Route path='/:userName/curation-rewards' component={curationRewards}/>
-                      <Route path='/:userName/author-rewards' component={authorRewards}/>
-                      {/* <Redirect from='/:userName' to ={`/${ByUserName}/posting`}/> */}
-                    </div>
-            </div>
+                </Person_meta_container>     
+                <Content_container>
+                    <Route path='/users/:userName/posts' component={PostList}/>
+                    <Route path='/users/:userName/messages' component={MyLeaveMessage}/>
+                    <Route path='/users/:userName/comments' component={Comment}/>
+                    <Route path='/users/:userName/walet' component={Walet}/>
+                </Content_container>
+            </Container_content>
         </Container>
 
     )
  }
 }
-const mapStateToProps = (state, ownProps) => {
-    return {...state.accounts}
+const mapStateToProps = (state) => {
+    return {
+        ...state.accounts,
+        ...state.users
+    }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
     return {
         getUser:()=>{
+
             dispatch({
                 type:'accounts/getUserMeta',
                 payload:ownProps.match.params.userName
               })
+        },
+        postUserOper:(payload)=>{
+             dispatch({
+                type:'posts/UserOper',
+                payload
+            })
         }
+     
      }
 }
 export default connect(mapStateToProps,mapDispatchToProps)(Transfers)

@@ -8,7 +8,7 @@ const  get_gameStar_power =(account,username,properties)=>{
 
         total_vesting_shares = properties.total_vesting_shares;
         let total_vesting_fund = properties.total_vesting_fund_gbc;
-        console.log(vesting_shares, total_vesting_shares, total_vesting_fund)
+ 
         var gameStar_power = gameStar.formatter.vestTogamebank(vesting_shares, total_vesting_shares, total_vesting_fund);
         gameStar_power = Math.floor(gameStar_power*1000)/1000 +' GBC';
 

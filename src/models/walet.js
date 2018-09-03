@@ -32,33 +32,37 @@ export default {
         ]
     //    计算账户gameStarPower和账户公钥
        const gameStarPower=yield call(getgameStarPower,result,userName,properties)
-       yield put({ type: 'save',payload:{userState:{...result[0],...gameStarPower}}});
-      },
 
+       yield put({ type: 'save',payload:{userState:{...result[0],...gameStarPower}}});
+
+      },
       *Transfer({payload},{call,put,select}){
           // 验证是否转账权限
-        const {activePriWif,ownerPriWif} = yield select(state=>state.users)
-        if(!activePriWif || !ownerPriWif){
+        const {activePriWif,userName} = yield select(state=>state.users.loginUserMeta)
+        if(!activePriWif){
            return yield put({
-                type:'global/changeShowPopupLogin',  
+                type:'global/showSignModal',  
                 payload:{
                     doingTask:'walet/Transfer',
                     doingParams:payload
                 }
             })
         }
-        payload.unshift(activePriWif||ownerPriWif)
+        payload.unshift(activePriWif)
         yield call(fetchUrl,'broadcast/transfer',{
             method:'POST',
             payload
         })
-        const openNotification = () => {
-            notification.open({
-              message: '转账',
-              description: '转账成功',
-            });
-        }
-        openNotification()
+        yield put({
+            type:"fetchUserWalet",
+            payload:{
+                userName
+            }  
+        })
+         notification.open({
+            message: '转账',
+            description: '转账成功',
+          });
       },
     },
     reducers: {

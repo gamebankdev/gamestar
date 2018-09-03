@@ -1,8 +1,15 @@
 import React from 'react'
 import { Form, Icon, Input, Button, Checkbox } from 'antd';
 import {connect} from 'dva'
+import styled from 'styled-components';
 const FormItem = Form.Item;
+const Repess_pass_title = styled.p`
+    color: #333;
+    font-size:20px;
+    padding:30px 0 20px 0;
+    box-sizing:border-box;
 
+`
 class Repass extends React.Component{
     constructor(props){
         super(props)
@@ -38,22 +45,7 @@ class Repass extends React.Component{
         const { getFieldDecorator } = this.props.form;
         return(
             <div>
-                <h1>重置{userName}的密码</h1>
-                <p style={{color:'#808891',fontSize:'16px'}}>
-                GameBank的第一条规则是: 不要丢失你的密码。
-                <br/>
-                GameBank的第二条规则是: 不要丢失你的密码。
-                <br/>
-                GameBank的第三条规则是: 我们无法恢复你的密码。
-                <br/>
-                第四条规则是: 如果你能记住密码，那就不安全了。
-                <br/>
-                第五条规则是: 只能使用随机生成的密码。
-                <br/>
-                第六条规则是: 请不要把你的密码告诉任何人。
-                <br/>
-                第七条规则是: 始终备份你的密码。
-                </p>
+                <Repess_pass_title>重置密码</Repess_pass_title>
                 <Form onSubmit={this.handleSubmit} className="login-form">
                     <FormItem>
                       <Input disabled prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />
@@ -87,6 +79,21 @@ class Repass extends React.Component{
                         修改密码
                     </Button>
                     </FormItem>
+                    <p style={{color:'#808891',fontSize:'16px'}}>
+                GameBank的第一条规则是: 不要丢失你的密码。
+                <br/>
+                GameBank的第二条规则是: 不要丢失你的密码。
+                <br/>
+                GameBank的第三条规则是: 我们无法恢复你的密码。
+                <br/>
+                第四条规则是: 如果你能记住密码，那就不安全了。
+                <br/>
+                第五条规则是: 只能使用随机生成的密码。
+                <br/>
+                第六条规则是: 请不要把你的密码告诉任何人。
+                <br/>
+                第七条规则是: 始终备份你的密码。
+                </p>
                 </Form>
             </div>
         )

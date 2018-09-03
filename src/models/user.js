@@ -3,17 +3,48 @@ import gameStar from '../utils/gameBank'
 import {routerRedux} from "dva/router";
 import { Base64 } from 'js-base64';
 import Loginjs from '../utils/loginjs'
+import {message} from 'antd'
 const usermeta=window.localStorage.getItem('usermeta')?JSON.parse(Base64.decode(window.localStorage.getItem('usermeta'))):{}
-console.log('usermeta',usermeta)
+
 export default {
     namespace: 'users',
     state: {
-        isLogin:usermeta.isLogin,
+        loginUserMeta:usermeta,
+        folloing:[],
+        ignore:[],
+        login_checkUserName_isHas:false,
         SuggestedPassword:'',
-        userName:usermeta.userName,
-        privePostingWif:usermeta.postingPriWif,
+        changeAvterSuccess:true,
+        changeAvterFailer:false,
+    },
+    subscriptions:{
+        setup({ dispatch}) {
+            dispatch({
+                type:'getFollowingMethod',
+                limit:20
+            }),
+            dispatch({
+                type:'getFollowIgnore',
+                limit:20
+            })
+        },
     },
     effects: {
+      //检查用户是否存在
+        *checkUserName({userName},{call,put}){
+            const Result = yield call(fetchUrl,'api/getAccounts',{
+                method:'POST',
+                payload:[[userName]]
+            })
+            if(Result.length==0){
+                yield put({
+                    type:"save",
+                    payload:{
+                      login_checkUserName_isHas:true
+                    }
+                })
+            }
+        },
         // 登陆
       *fetchLogin({ payload }, { call, put }) {
         const {userName}=payload
@@ -26,24 +57,79 @@ export default {
                 throw '用户名不存在'
             }
             const result  = yield  call(Loginjs,payload,loginResult)
+            if(result.passwordType!='posting'){
+                throw '请输入posting或主密码'
+            }
             const obj=JSON.stringify({
-                isLogin:result.isvalid,
+                isLogin:result.isLogin,
                 userName:result.userName,
-                privePostingWif:result.postingPriWif,
+                privePostingWif:result.privePostingWif,
+                memo_key:result.memo_key
             })
             window.localStorage.setItem('usermeta',Base64.encode(obj));
             yield put({
                 type:'save',
-                payload:result,
+                payload:{
+                    loginUserMeta:result
+                },
             })
             yield put(routerRedux.push("/"))
+
         }catch(err){
-            console.log(err)
+  
             throw err
         }  
       },
+    //   退出
+      *clearlocalstor({},{put}){
+        window.localStorage.clear()
+        yield put({
+            type:"save",
+            payload:{
+                loginUserMeta:{
+                    isLogin:false
+                }
+            }  
+        })
+        yield put(routerRedux.push("/"))
+      },
+      //获取屏蔽的人
+      *getFollowingMethod({limit},{call,put,select}){
+         
+            const {userName} = yield select(state=>state.users.loginUserMeta)
+            if(!userName){
+                return;
+            }
+            const ignoreArray = yield call(fetchUrl,'api/getFollowing',{
+                method:'POST',
+                payload:[userName,"",'ignore',limit]
+            })
+            yield put({
+                type:"save",
+                payload:{
+                    ignore:[...ignoreArray]
+                }
+            })
+      },  
+      //获取关注的人
+      *getFollowIgnore({limit},{call,put,select}){
+        const {userName} = yield select(state=>state.users.loginUserMeta)
+        if(!userName){
+            return;
+        }
+        const folloingArray = yield call(fetchUrl,'api/getFollowing',{
+            method:'POST',
+            payload:[userName,"",'blog',limit]
+        })
+        yield put({
+            type:"save",
+            payload:{
+                folloing:[...folloingArray]
+            }
+        })
+     },  
       //生成建议密码
-      *CreateSuggestedPassword({payload},{call,put}){
+      *CreateSuggestedPassword({},{call,put}){
             const password = gameStar.formatter.createSuggestedPassword();
             yield put({
                 type:'save',
@@ -54,7 +140,6 @@ export default {
       },
       //修改密码
       *changePassword({payload},{call,put,select}){
-          const userState =  yield select(state=>state.walet.userState)
           const {aginSuggestedPassword,wif} = payload
           const publicKeys = gameStar.auth.generateKeys('name', aginSuggestedPassword, ['owner', 'active', 'posting', 'memo']);
           const owner = { weight_threshold: 1, account_auths: [], key_auths: [[publicKeys.owner, 1]] };
@@ -66,9 +151,8 @@ export default {
               payload:[wif,'test1',owner,active,posting,memoKey,{}]
           })
       },
-    //   *弹窗登陆逻辑
-    //  正常的登陆逻辑，保存登陆结果到state,登陆成功,执行上一步未完成的任务
-     *PopupLogin({payload},{call,put,select}){
+    //   签名操作
+     *Signtrans({payload},{call,put,select}){
         const {userName}=payload
         const loginResult = yield call(fetchUrl,'api/getAccounts',{
             method:'POST',
@@ -79,15 +163,65 @@ export default {
         }
         const result  = yield  call(Loginjs,payload,loginResult)
         yield put({
-                type:'save',
-                payload:result,
+            type:'save',
+            payload:{
+              loginUserMeta:result
+            }
         })
-        yield put({type:'global/changeShowPopupLogin'})
+        yield put({type:'global/showSignModal'})
         const {doingTask,doingParams} = yield select(state=>state.global)
-        yield put({
-            type:doingTask,
-            payload:doingParams
-        })
+        if(doingTask){
+            yield put({
+                type:doingTask,
+                payload:doingParams
+            })
+        }
+     },
+     *changeAvter({payload},{call,put,select}){
+          // 签名权限
+          try{
+            const {activePriWif,userName} = yield select(state=>state.users.loginUserMeta)
+            if(!activePriWif){
+               return yield put({
+                    type:'global/showSignModal',  
+                    payload:{
+                        doingTask:'changeAvter',
+                        doingParams:payload
+                    }
+                })
+          }
+          payload.unshift(activePriWif)
+          const changeResult=yield call(fetchUrl,'broadcast/accountUpdate',{
+              method:"POST",
+              payload
+          })
+          const StateAccounts = yield select(state=>state.accounts) 
+           yield put({
+              type:"accounts/save",
+              payload:{
+                  userAccounts:{
+                       ...StateAccounts.userAccounts,
+                       json_metadata:changeResult.operations[0][1].json_metadata
+                    }  
+              }
+            })
+            yield put({
+                type:'save',  
+                payload:{
+                    changeAvterSuccess:true,
+                    changeAvterFailer:false,
+                }
+            })
+            message.success("修改头像成功")
+          }catch(err){
+            yield put({
+                type:'save',  
+                payload:{
+                    changeAvterSuccess:false,
+                    changeAvterFailer:true,
+                }
+            })
+          }
      }
     },
     reducers: {

@@ -1,32 +1,76 @@
-import List from '../components/myPostsList'
-import {connect} from 'dva'
 import React from 'react'
-
+import {connect} from 'dva'
+import styled from 'styled-components'
+import ListContaniner from '../components/my_list_container'
+const Container = styled.div`
+    width:100%;
+    font-family:'SimHei'
+`
+const My_post_title = styled.span`
+    font-size:18px;
+    padding-bottom:10px;
+    border-bottom:1px solid red;
+    color:#ff605f;
+    box-sizing:border-box;
+    position:relative;
+    bottom:-5px;
+`
+const My_posts_lists_container = styled.div`
+    margin-top:10px;
+    border-top:1px solid #c6c6c6;
+    border-bottom:1px solid #c6c6c6;
+    padding:0 10px 10px 10px;
+    box-sizing:border-box;
+`
+const Post_title =styled.p`
+    font-size:18px;
+    color: #333;
+    padding:20px 0;
+    box-sizing:border-box;
+`
 class MyPostList extends React.Component{
+    constructor(props){
+        super(props)
+        this.state={
+            voteLoading:false
+        }
+    }
     componentDidMount(){
         this.props.getAccountPost()
     }
+    vote(){
+
+    }
+    changeShow(){
+
+    }
     render(){
-        const {content,userReputation}=this.props
+        const {posts} =this.props;
         return(
-            <div>
-                <div>
-                    {
-                        Object.values(content).map((item,index)=>{
-                            if(item.parent_author==""){
-                                return   <List key={index} {...item} userReputation={userReputation} />
-                            }else{
-                                return null
-                            }
-                        })
-                    }
-                </div>
-            </div>
+            <Container>
+              <My_post_title>我的发帖</My_post_title>
+              <My_posts_lists_container>
+                {
+                    Object.values(posts).map((Item,index)=>{
+                        return  (
+                            <ListContaniner 
+                                  key={index} 
+                                  {...Item}
+                            >
+                                <Post_title>专业推荐</Post_title>
+                                <div dangerouslySetInnerHTML={{__html:Item.body}}></div>
+                            </ListContaniner>
+                        ) 
+                    })
+                }
+               
+              </My_posts_lists_container>
+            </Container>
         )
     }
 }
-const mapStateToProps = (state, ownProps) => {
-    return {...state.accounts.allPost,...{userReputation:state.accounts.userReputation}}
+const mapStateToProps = (state) => {
+    return {posts:state.accounts.Posts.content}
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
     return {
@@ -38,4 +82,5 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         }
     }
 }
+
 export default connect(mapStateToProps,mapDispatchToProps)(MyPostList) 
