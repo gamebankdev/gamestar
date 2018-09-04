@@ -1,5 +1,5 @@
 import fetch from 'dva/fetch';
-import config from '../../config'
+import config from '../config'
 function parseJSON(response) {
   return response.json();
 }

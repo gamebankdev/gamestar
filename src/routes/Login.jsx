@@ -48,8 +48,12 @@ class Login extends Component{
         }
     }
     checkUserName=(rule, value, callback)=>{
-        this.props.checkuser(value)
-        callback()
+        if(!value){
+            callback('请输入用户名！')
+        }else{
+            this.props.checkuser(value)
+            callback()
+        }
     }
     handleSubmit = (e) => {
         e.preventDefault();
@@ -60,33 +64,33 @@ class Login extends Component{
         });
       }
     render(){
-        const { getFieldDecorator,setFields } = this.props.form;
+        const { getFieldDecorator} = this.props.form;
         return (
         <Container>
             <Login_title>登陆</Login_title>
             <Login_Container_content>
             <Login_form>
-                <Form onSubmit={this.handleSubmit} className="login-form">
+                <Form onSubmit={this.handleSubmit}>
                 <FormItem
                   label="用户名:"
                   {...formItemLayout}
                 >
-                    {getFieldDecorator('userName', {
+                  {getFieldDecorator('userName', {
                         validateTrigger:'onBlur',
                         rules: [{ required: true, message: '请输入用户名!',validator:this.checkUserName}],
                     })(
-                    <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="gameBank 帐户名称" />
-                        )}
+                      <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="gameBank 帐户名称" />
+                    )}
                 </FormItem>
                 <FormItem
                   label="密码:"
                   {...formItemLayout}
                 >
-                {getFieldDecorator('password', {
-                        rules: [{ required: true, message: '请输入密码!' }],
-                        })(
-                        <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="请输入posting或主密码" />
-                        )}
+                  {getFieldDecorator('password', {
+                    rules: [{ required: true, message: '请输入密码!' }],
+                    })(
+                      <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="请输入posting或主密码" />
+                    )}
                 </FormItem>
                 <br/>
                 <FormItem
@@ -100,6 +104,7 @@ class Login extends Component{
                           height:"60px",
                           lineHeight:"60px",
                           borderRadius:"5px",
+                          border:0,
                           background:"#f85352",
                           color:"#fff",
                           fontSize:"30px"

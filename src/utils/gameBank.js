@@ -1,6 +1,6 @@
 import gamebank from 'gamebank'
-import config from '../../config'
-gamebank.api.setOptions({ url: 'http://192.168.1.126:8000' })
-gamebank.config.set('address_prefix',config.address_prefix);
-gamebank.config.set('chain_id',config.chain_id);
+import config from '../config'
+gamebank.api.setOptions({ url: 'http://www.gbank.pro:5000/API/' })
+gamebank.config.set('address_prefix','TST');
+gamebank.config.set('chain_id','18dcf0a285365fc58b71f18b3d3fec954aa0c141c44e4e5cb4cf777b9eab274e');
 export default gamebank;

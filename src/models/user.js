@@ -32,17 +32,16 @@ export default {
     effects: {
       //检查用户是否存在
         *checkUserName({userName},{call,put}){
-            const Result = yield call(fetchUrl,'api/getAccounts',{
-                method:'POST',
-                payload:[[userName]]
-            })
-            if(Result.length==0){
-                yield put({
-                    type:"save",
-                    payload:{
-                      login_checkUserName_isHas:true
-                    }
+            try{
+                const Result = yield call(fetchUrl,'api/getAccounts',{
+                    method:'POST',
+                    payload:[[userName]]
                 })
+                if(Result.length==0){
+                    throw "用户名不存在!"
+                }
+            }catch(err){
+                throw err
             }
         },
         // 登陆
@@ -54,29 +53,29 @@ export default {
                 payload:[[userName]]
             })
             if(loginResult.length==0){
-                throw '用户名不存在'
+                throw '用户名不存在!'
             }
             const result  = yield  call(Loginjs,payload,loginResult)
-            if(result.passwordType!='posting'){
+            console.log("result",result)
+            if(result.passwordType=='posting'||result.passwordType=='master'){
+                const obj=JSON.stringify({
+                    isLogin:result.isLogin,
+                    userName:result.userName,
+                    privePostingWif:result.privePostingWif,
+                    memo_key:result.memo_key
+                })
+                window.localStorage.setItem('usermeta',Base64.encode(obj));
+                yield put({
+                    type:'save',
+                    payload:{
+                        loginUserMeta:result
+                    },
+                })
+                yield put(routerRedux.push("/"))
+            }else{
                 throw '请输入posting或主密码'
             }
-            const obj=JSON.stringify({
-                isLogin:result.isLogin,
-                userName:result.userName,
-                privePostingWif:result.privePostingWif,
-                memo_key:result.memo_key
-            })
-            window.localStorage.setItem('usermeta',Base64.encode(obj));
-            yield put({
-                type:'save',
-                payload:{
-                    loginUserMeta:result
-                },
-            })
-            yield put(routerRedux.push("/"))
-
         }catch(err){
-  
             throw err
         }  
       },
@@ -95,7 +94,7 @@ export default {
       },
       //获取屏蔽的人
       *getFollowingMethod({limit},{call,put,select}){
-         
+         try{
             const {userName} = yield select(state=>state.users.loginUserMeta)
             if(!userName){
                 return;
@@ -110,23 +109,30 @@ export default {
                     ignore:[...ignoreArray]
                 }
             })
+         }catch(err){
+             throw err
+         }
       },  
       //获取关注的人
       *getFollowIgnore({limit},{call,put,select}){
-        const {userName} = yield select(state=>state.users.loginUserMeta)
-        if(!userName){
-            return;
-        }
-        const folloingArray = yield call(fetchUrl,'api/getFollowing',{
-            method:'POST',
-            payload:[userName,"",'blog',limit]
-        })
-        yield put({
-            type:"save",
-            payload:{
-                folloing:[...folloingArray]
+          try{
+            const {userName} = yield select(state=>state.users.loginUserMeta)
+            if(!userName){
+                return;
             }
-        })
+            const folloingArray = yield call(fetchUrl,'api/getFollowing',{
+                method:'POST',
+                payload:[userName,"",'blog',limit]
+            })
+            yield put({
+                type:"save",
+                payload:{
+                    folloing:[...folloingArray]
+                }
+            })
+          }catch(err){
+              throw err
+          }
      },  
       //生成建议密码
       *CreateSuggestedPassword({},{call,put}){
@@ -162,20 +168,27 @@ export default {
             throw '用户未注册'
         }
         const result  = yield  call(Loginjs,payload,loginResult)
-        yield put({
-            type:'save',
-            payload:{
-              loginUserMeta:result
-            }
-        })
-        yield put({type:'global/showSignModal'})
-        const {doingTask,doingParams} = yield select(state=>state.global)
-        if(doingTask){
+        console.log("result",result)
+        if(result.passwordType!=='active' || result.passwordType!=='master'){
+           
             yield put({
-                type:doingTask,
-                payload:doingParams
+                type:'save',
+                payload:{
+                  loginUserMeta:result
+                }
             })
+            yield put({type:'global/showSignModal'})
+            const {doingTask,doingParams} = yield select(state=>state.global)
+            if(doingTask){
+                yield put({
+                    type:doingTask,
+                    payload:doingParams
+                })
+            }
+        }else{
+             throw '请使用avtive密码/或者主密码'
         }
+       
      },
      *changeAvter({payload},{call,put,select}){
           // 签名权限

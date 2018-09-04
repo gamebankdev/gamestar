@@ -69,7 +69,6 @@ class ChangeAvterModal extends React.Component{
         }
         if (info.file.status === 'done') {
           message.success('图片上传成功!');
-
           getBase64(info.file.originFileObj, imageUrl => this.setState({
             imageUrl,
             uploadDoneUrl:info.file.response.data[0],
@@ -78,10 +77,10 @@ class ChangeAvterModal extends React.Component{
         }
       }
     handleUpload=()=>{
-        const {userName}=this.props
+        const {userName,memo_key}=this.props
         this.props.dispatch({
             type:"users/changeAvter",
-            payload:[userName,undefined,undefined,undefined,'TST8JYEeYpaYwqiB2cvKcJe7hAK4GGshZhYWBqB2N7wDiDQF984ha',{
+            payload:[userName,undefined,undefined,undefined,memo_key,{
                 profile:{
                     profile_image:this.state.uploadDoneUrl
                 }
@@ -111,7 +110,7 @@ class ChangeAvterModal extends React.Component{
                                 listType="picture-card"
                                 className="avatar-uploader"
                                 showUploadList={false}
-                                action={`http://47.94.21.121:4000/v1/avter/uoload`}
+                                action={`http://www.gbank.pro:4000/v1/avter/uoload`}
                                 beforeUpload={this.beforeUploadAvter}
                                 onChange={this.handleChange}
                             >

@@ -68,7 +68,7 @@ class MyListContainer extends React.Component{
              <Post_key_container>
                     <Post_user>
                         <User_name_avter>
-                            <img src={require("../assets/u=886475800.png")} alt=""/>
+                            <img src={require("../assets/DefaultAvter.jpg")} alt=""/>
                             <span>{author}</span>
                         </User_name_avter>
                         <div>
@@ -78,7 +78,6 @@ class MyListContainer extends React.Component{
                     {this.props.children}
                     <Oper_container>
                       <Oper_button>
-                             
                           <span style={{color:"#d46e00"}}>{pending_payout_value}</span>
                       </Oper_button>
                       <Oper_button>

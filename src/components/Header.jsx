@@ -56,7 +56,7 @@ const Login_register = styled.div`
         border:none;
     }
 `
-const Header=({isLogin,userName,dispatch})=>{
+const Header=({userName,dispatch})=>{
     return(
         <HaderContainer>
             <HeadContent>
@@ -66,7 +66,7 @@ const Header=({isLogin,userName,dispatch})=>{
                     </Link>
                 </HeadLog>
                 {
-                    !isLogin? 
+                    !userName? 
                     <Login_register>
                         <span>
                         <Link to="/login">登录</Link>   

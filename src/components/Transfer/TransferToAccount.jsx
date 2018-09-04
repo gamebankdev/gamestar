@@ -19,7 +19,7 @@ class TransferInput extends React.Component{
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
           if (!err) {
-            values.amount=`${Number(values.amount).toFixed(3)} GBC`
+            values.amount=`${Number(values.amount).toFixed(3)} GB`
             this.props.Transfer(values)
                 .then(res=>{
                     this.props.onCancel()
@@ -74,7 +74,7 @@ class TransferInput extends React.Component{
                     {getFieldDecorator('amount', {
                     rules: [{ required: true,type:'number' ,validator:(rule, value, callback)=>this.validateCount(rule, value, callback) }],
                 })(
-                    <Input addonBefore='金额'  type='number' addonAfter="GBC" placeholder='数量'/>
+                    <Input addonBefore='金额'  type='number' addonAfter="GB" placeholder='数量'/>
                 )}
                 <p style={{paddingLeft:"40px"}}>
                   <Button style={{border:'0'}} onClick={this.setAccountValue}  size={'small'}>余额</Button>

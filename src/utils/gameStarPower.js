@@ -10,7 +10,7 @@ const  get_gameStar_power =(account,username,properties)=>{
         let total_vesting_fund = properties.total_vesting_fund_gbc;
  
         var gameStar_power = gameStar.formatter.vestTogamebank(vesting_shares, total_vesting_shares, total_vesting_fund);
-        gameStar_power = Math.floor(gameStar_power*1000)/1000 +' GBC';
+        gameStar_power = Math.floor(gameStar_power*1000)/1000 +' GB';
 
         resolve({gameStar_power: gameStar_power,});        
     });

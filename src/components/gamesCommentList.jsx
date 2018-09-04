@@ -156,6 +156,7 @@ class CommentList extends React.Component {
     postComemnt(value,permlink){
         const {author}=this.props.props
         const {privePostingWif,userName}=this.props.users.loginUserMeta
+        
         if(!privePostingWif){
           return message.warning('请先登陆');
         }
@@ -233,7 +234,7 @@ class CommentList extends React.Component {
     render(){
         const {body,replies,created,author,active_votes,id,permlink,child,reward} = this.props.props
         const {userName} = this.props.users.loginUserMeta
-        const {allComment} = this.props
+        const {allComment,accounts} = this.props
         const {isIgore,isFollow} = this.state
         const Popovercontent = (author)=>{
             return(
@@ -255,7 +256,12 @@ class CommentList extends React.Component {
      return (
           <Game_comment_parent_container>
                     <User_img>
-                    <img src={require('../assets/content_img_2.png')} alt=""/>
+                    {
+                        accounts[author].json_metadata
+                        ? <img src={JSON.parse(accounts[author].json_metadata).profile.profile_image} alt=""/>
+                        : <img src={require('../assets/DefaultAvter.jpg')} alt=""/>
+                    }
+                   
                     </User_img>
                             <Comment_meta>
                                 <Comment>
@@ -313,6 +319,7 @@ class CommentList extends React.Component {
                                         const child=  <ComemntChild 
                                               key={index} 
                                               prop={item} 
+                                              accounts={accounts}
                                               vote={(permlink,author)=>this.vote(permlink,author)}
                                               cancleShield={(author)=>this.cancleShield(author)}
                                               Shield={(author)=>this.Shield(author)}
@@ -323,6 +330,7 @@ class CommentList extends React.Component {
                                               follow={(root_author)=>this.follow(root_author)}
                                             />
                                         if(!this.state.showAllchildComment){
+                                            
                                           if(index<3){
                                             return child
                                           }

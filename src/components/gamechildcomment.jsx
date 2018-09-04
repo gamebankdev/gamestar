@@ -136,7 +136,7 @@ class Gamechildcomment extends React.Component{
     }
     render(){
         const {body,created,author,active_votes,replies,reward,permlink} = this.props.prop
-        const {follow,vote,cancleShield,canclefollow,Shield} = this.props
+        const {follow,vote,cancleShield,canclefollow,Shield,accounts} = this.props
         const {isIgore,isFollow} = this.state
         const {userName} = this.props.users.loginUserMeta
         const Popovercontent = (author)=>{
@@ -158,7 +158,11 @@ class Gamechildcomment extends React.Component{
         return (
              <Game_comment_child_container>
                     <User_img>
-                    <img src={require('../assets/content_img_2.png')} alt=""/>
+                    {
+                        accounts[author].json_metadata
+                        ? <img src={JSON.parse(accounts[author].json_metadata).profile.profile_image} alt=""/>
+                        : <img src={require('../assets/DefaultAvter.jpg')} alt=""/>
+                    }
                     </User_img>
                             <Comment_meta>
                                 <Comment>

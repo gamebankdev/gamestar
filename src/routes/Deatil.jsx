@@ -3,7 +3,7 @@ import React from 'react'
 import CommentList from '../components/gamesCommentList'
 import Wangeditor from '../components/wangEditor'
 import {connect} from 'dva'
-import { message,Pagination } from 'antd';
+import { message,Pagination,Alert } from 'antd';
 import formtTime from '../utils/formatTime'
 const Container = styled.div`
   width:100%;
@@ -91,7 +91,9 @@ class Deatail extends React.Component{
     constructor(props){
         super(props)
         this.state={
-            isShowWangeditor:false
+            isShowWangeditor:false,
+            SectionStart:0,
+            SectionEnd:10
         }
     }
     componentDidMount(){
@@ -114,13 +116,21 @@ class Deatail extends React.Component{
         const {id} = this.props.match.params
         this.props.postComment([privePostingWif,'',id, userName, new Date().getTime().toString(),new Date().getTime().toString(), value, {tags:[id]}])        
     }
-    render(){
 
+    changePagination=(page,pageSize)=>{
+        this.setState({
+            SectionStart:page*10-10,
+            SectionEnd:10*page
+        })
+    }
+    render(){
         const {introduce,created_at,logo,gameName,tag} = this.props.gamesDetail
         const {isShowWangeditor}=this.state
+
         const {id} = this.props.match.params
         const {privePostingWif,userName}=this.props.loginUserMeta
-        const {total_posts,tonewCommentArray}=this.props.gamesComment
+        const {total_posts,tonewCommentArray,accounts}=this.props.gamesComment
+        
         return(
             <Container>
                 <ContentContainer>
@@ -161,28 +171,29 @@ class Deatail extends React.Component{
                     <Game_comments>
                         <LastcommentsTitle>最新评论</LastcommentsTitle>
                         {
+                            tonewCommentArray.length>0?
                             tonewCommentArray.map((item,index)=>{
-                                if(item.parent_author==""){
-                                    var obj={
+                                var obj={
                                         ...item,
                                         gameId:id,
                                         privePostingWif,
                                         userName,
                                     }
-                                    return  <CommentList key={index}  props ={obj}  />
-                                }else{
-                                    return null
+                                if(index>=this.state.SectionStart && index<this.state.SectionEnd){
+                                    return  <CommentList key={index} accounts={accounts} props ={obj}  />
                                 }
                             })
+                            :<Alert message="暂无评论" style={{textAlign:"center"}} type="info" />
                         }
-
+                       
                     </Game_comments>
                     <PaginationContainer>
                       <Pagination 
                         showQuickJumper={false}
                         defaultCurrent={1} 
-                        defaultPageSize={5}
+                        defaultPageSize={10}
                         hideOnSinglePage={true}
+                        onChange={this.changePagination}
                         total={total_posts}  />
                     </PaginationContainer>
                 </ContentContainer>
@@ -191,6 +202,7 @@ class Deatail extends React.Component{
     }   
 }
 const mapStateToProps = (state, ownProps) => {
+    console.log("state",state)
     return {...state.users,...state.games}
 }
 const mapDispatchToProps = (dispatch, ownProps) => {

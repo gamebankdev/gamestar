@@ -50,7 +50,7 @@ class WangEditor extends React.Component{
             'emoticon',  // 表情
             'image',  // 插入图片
         ]
-        this.editor.customConfig.uploadImgServer = `http://127.0.0.1:4000/v1/${this.props.userName}/uoload`
+        this.editor.customConfig.uploadImgServer = `http://47.94.21.121:4000/v1/${this.props.userName}/uoload`
         this.editor.customConfig.uploadImgMaxSize = 3 * 1024 * 1024
         this.editor.customConfig.uploadImgMaxLength = 1
         this.editor.customConfig.uploadFileName = 'file'

@@ -1,5 +1,7 @@
 import React from 'react'
 import {connect} from 'dva'
+import { Pagination,Alert } from 'antd';
+
 import styled from 'styled-components'
 import ListContaniner from '../components/my_list_container'
 const Container = styled.div`
@@ -38,12 +40,13 @@ class MyPostList extends React.Component{
     componentDidMount(){
         this.props.getAccountPost()
     }
-    vote(){
-
+    handleChange=(page, pageSize)=>{
+        this.setState({
+            SectionStart:page*10-10,
+            SectionEnd:10*page
+        })
     }
-    changeShow(){
 
-    }
     render(){
         const {posts} =this.props;
         return(
@@ -51,7 +54,8 @@ class MyPostList extends React.Component{
               <My_post_title>我的发帖</My_post_title>
               <My_posts_lists_container>
                 {
-                    Object.values(posts).map((Item,index)=>{
+                    Object.values(posts).length>0
+                    ?Object.values(posts).map((Item,index)=>{
                         return  (
                             <ListContaniner 
                                   key={index} 
@@ -62,7 +66,18 @@ class MyPostList extends React.Component{
                             </ListContaniner>
                         ) 
                     })
+                    :<Alert style={{display:"flex",justifyContent:"center",marginTop:'20px'}} message="暂无数据" type="error" />
                 }
+                <div style={{display:"flex",justifyContent:"center",marginTop:"20px"}}>
+                  <Pagination 
+                    size="small" 
+                    hideOnSinglePage
+                    defaultCurrent={1}
+                    defaultPageSize={10}
+                    onChange={this.handleChange}
+                    total={ Object.values(posts).length}
+                    />
+                </div>
                
               </My_posts_lists_container>
             </Container>

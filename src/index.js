@@ -1,11 +1,12 @@
 import dva from 'dva';
 import './index.css';
-import createHistory from 'history/createHashHistory';
+import createHistory from 'history/createBrowserHistory';
 
 import {message} from 'antd'
 // 1. Initialize
 const app = dva({
     onError(e,dispatch){
+        console.log(e)
         message.error(e.message)
     },
     history:createHistory({
