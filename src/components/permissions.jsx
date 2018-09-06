@@ -65,7 +65,7 @@ class Permissions extends React.Component{
                         <Icon style={{fontSize:"40px"}} type="qrcode" />
                         <span>{showPostingPub?postingPubKey.key_auths[0]:loginUserMeta.privePostingWif}</span>
                       </Key_code_text>
-                      <p>Posting Key用于发帖和投票。它应与Active Key和Owner Key区分使用。</p>
+                      <p>发帖密钥,用于发帖和投票。它应与资产密钥和帐户主密钥区分使用。</p>
                     </div>
                     <div>   
                       <Button 
@@ -77,12 +77,12 @@ class Permissions extends React.Component{
                 </Key_index_Container>
                 <Key_index_Container>
                         <div>
-                            <h3>活跃</h3>
+                            <h3>资产</h3>
                             <Key_code_text>
                               <Icon type="qrcode" />
                               <span>{showActivePub?ActivePubKey.key_auths[0]:loginUserMeta.activePriWif}</span>
                             </Key_code_text>
-                            <p>Active Key用于转帐和在内部市场下单。</p>
+                            <p>资产密钥用于转帐</p>
                         </div>
                         <div>   
                         {
@@ -103,13 +103,13 @@ class Permissions extends React.Component{
                 </Key_index_Container>
                 <Key_index_Container>
                     <div>
-                      <h3>拥有者</h3>
+                      <h3>帐户主密钥</h3>
                           <Key_code_text>
                               <Icon type="qrcode" />
                               <span>{ownerPubKey.key_auths[0]}</span>
                             </Key_code_text>
-                            <p>Owner Key是帐户的主密钥，用于更改其它密钥。</p>
-                            <p>Owner Key的私钥或密码应尽可能保持离线。</p>
+                            <p>帐户主密钥，用于更改其它密钥。</p>
+                            <p>帐户主密钥的私钥或密码应尽可能保持离线。</p>
                         </div>
                 </Key_index_Container>
                 <Key_index_Container>
@@ -119,7 +119,7 @@ class Permissions extends React.Component{
                               <Icon type="qrcode" />
                               <span>{memoPubkey}</span>
                             </Key_code_text>
-                            <p>Memo Key用于创建和读取备注。</p>
+                            <p>备注密钥用于创建和读取备注。</p>
                         </div>
                 </Key_index_Container>
             </div>

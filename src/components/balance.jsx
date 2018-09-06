@@ -35,8 +35,7 @@ class Balance extends React.Component{
               <UserWallet__balance>
                     <div style={{color:'#808891',fontSize:'17px'}}>
                     GB: GBcoin
-                        <div style={{fontSize:'12px'}}>可交易代币可以在任何时候发送到任何地方。GBc可以在一个被称为Power Up的过程中被
-                        <br/> GameStar POWER。</div>
+                        <div style={{fontSize:'12px'}}>可交易代币,也可以转换成GBP</div>
                     </div>
                     {
                       routerUserName==userName? 
