@@ -43,7 +43,7 @@ export default {
             const time= commentResult.props.time
             const rewardArr= Object.values(commentResult.content).map((item,index)=>{
                if(item.cashout_time<time){
-                    const obj={reward:(item.total_payout_value.split('')[0]*1000+item.curator_payout_value.split('')[0]*1000).toFixed(3)+' GBC'}
+                    const obj={reward:(item.total_payout_value.split('')[0]*1000+item.curator_payout_value.split('')[0]*1000).toFixed(3)+' GB'}
                     return {...item,...obj}
                }else{
                    return {...item,...{reward:item.pending_payout_value}}
@@ -52,6 +52,7 @@ export default {
             Object.keys(content).forEach((item,index)=>{
                 content[item]=rewardArr[index]
             })
+            
             const tonewCommentArray = yield call(Recursion,commentResult.content)
             yield put({
                 type:'save',

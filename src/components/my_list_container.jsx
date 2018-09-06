@@ -1,7 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Button} from 'antd';
+import { Button,Popover,Icon} from 'antd';
 import formatTime from '../utils/formatTime'
+import VotesList from './VotesList'
+import {timeDifference} from '../utils/formatTime'
 const Post_key_container = styled.div`
     background:#fff;
     padding:20px;
@@ -54,16 +56,9 @@ class MyListContainer extends React.Component{
             voteLoading:false
         }
     }
-    componentDidMount(){
-    }
-    vote(){
-
-    }
-    changeShow(){
-
-    }
     render(){
-        const {author,created,active_votes,replies,pending_payout_value} = this.props
+        const {author,created,active_votes,cashout_time,reward,replies,pending_payout_value} = this.props
+        console.log(this.props)
         return(
              <Post_key_container>
                     <Post_user>
@@ -78,12 +73,23 @@ class MyListContainer extends React.Component{
                     {this.props.children}
                     <Oper_container>
                       <Oper_button>
-                          <span style={{color:"#d46e00"}}>{pending_payout_value}</span>
+                        <Popover placement="bottomLeft" title={null} content={`${timeDifference(cashout_time)}${reward}`} trigger="click">
+                            <span style={{color:"#d46e00"}}>{reward}</span><Icon type="caret-down" style={{fontSize:"12px"}} theme="outlined" />
+                        </Popover>
                       </Oper_button>
                       <Oper_button>
-                        <span style={{background:"#fff",color:"#666"}} >
-                         投票 {active_votes.length}
-                        </span> 
+                        {
+                            active_votes.length>0
+                            ? <Popover placement="bottomLeft" title={null} content={<VotesList active_votes={active_votes}/>} trigger="click">
+                                {active_votes.length}
+                                    <span 
+                                        style={{background:"#fff",color:"#666"}} 
+                                        size='small'>个投票
+                                        <Icon type="caret-down" style={{fontSize:"12px"}} theme="outlined" />
+                                    </span> 
+                            </Popover>
+                            :null
+                        }
                       </Oper_button>
                       <Oper_button onClick={()=>this.changeShow(true)}>
                         <Button 

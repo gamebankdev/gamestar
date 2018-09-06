@@ -49,6 +49,7 @@ class Mycomments extends React.Component{
     }
     render(){
         const {Comments} =this.props;
+
         return(
             <Container>
               <My_post_title>我的评论</My_post_title>
@@ -62,7 +63,6 @@ class Mycomments extends React.Component{
                                     key={index} 
                                     {...Item}
                                     >
-                                    <Post_title>专业推荐</Post_title>
                                     <div dangerouslySetInnerHTML={{__html:Item.body}}></div>
                                 </ListContaniner>
                             ) 

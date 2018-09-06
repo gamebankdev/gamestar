@@ -39,14 +39,27 @@ export default {
     },
     effects:{
         *accountPosting({userName},{call,put}){
-            const allPost =yield call(fetchUrl,'api/getState',{
+            const commentResult =yield call(fetchUrl,'api/getState',{
                 method:'POST',
                 payload:[`/@${userName}`]
+            })
+            const content =commentResult.content
+            const time= commentResult.props.time
+            const rewardArr= Object.values(commentResult.content).map((item,index)=>{
+               if(item.cashout_time<time){
+                    const obj={reward:(item.total_payout_value.split('')[0]*1000+item.curator_payout_value.split('')[0]*1000).toFixed(3)+'GB'}
+                    return {...item,...obj}
+               }else{
+                   return {...item,...{reward:item.pending_payout_value}}
+               }
+            })
+            Object.keys(content).forEach((item,index)=>{
+                content[item]=rewardArr[index]
             })
             yield put({
                 type:'save',
                 payload:{
-                    Posts:allPost
+                    Posts:commentResult
                 }
             })
         },
@@ -55,6 +68,20 @@ export default {
                 method:'POST',
                 payload:[`/@${userName}/comments`]
             })
+            const content =allComment.content
+            const time= allComment.props.time
+            const rewardArr= Object.values(allComment.content).map((item,index)=>{
+               if(item.cashout_time<time){
+                    const obj={reward:(item.total_payout_value.split('')[0]*1000+item.curator_payout_value.split('')[0]*1000).toFixed(3)+'GB'}
+                    return {...item,...obj}
+               }else{
+                   return {...item,...{reward:item.pending_payout_value}}
+               }
+            })
+            Object.keys(content).forEach((item,index)=>{
+                content[item]=rewardArr[index]
+            })
+
             const arr = Object.keys( allComment.content)
             arr.forEach((item,index)=>{
                 const author_reputation=allComment.content[item].author_reputation
@@ -72,6 +99,20 @@ export default {
                 method:'POST',
                 payload:[`/@${path}/recent-replies`]
             })
+            const content =allReplays.content
+            const time= allReplays.props.time
+            const rewardArr= Object.values(allReplays.content).map((item,index)=>{
+               if(item.cashout_time<time){
+                    const obj={reward:(item.total_payout_value.split('')[0]*1000+item.curator_payout_value.split('')[0]*1000).toFixed(3)+'GB'}
+                    return {...item,...obj}
+               }else{
+                   return {...item,...{reward:item.pending_payout_value}}
+               }
+            })
+            Object.keys(content).forEach((item,index)=>{
+                content[item]=rewardArr[index]
+            })
+
             const arr = Object.keys( allReplays.content)
             arr.forEach((item,index)=>{
                 const author_reputation=allReplays.content[item].author_reputation
@@ -91,9 +132,7 @@ export default {
             payload:[[payload]]
         })
            //计算声望
-
         const reputation =gameStar.formatter.reputation(userAccounts[0].reputation)
-
         const FollowCounts = yield call(fetchUrl,'api/getFollowCount',{
             method:'POST',
             payload:[payload]

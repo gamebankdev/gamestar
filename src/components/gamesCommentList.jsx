@@ -1,12 +1,14 @@
 
 import React from 'react'
-import { Popover,message,Button } from 'antd';
+import { Popover,message,Button,Icon } from 'antd';
 import styled from 'styled-components'
 import Wangeditor from '../components/wangEditor'
 import ComemntChild from '../components/gamechildcomment'
 import {connect} from 'dva'
-import formtTime from '../utils/formatTime'
+import formtTime ,{timeDifference}  from '../utils/formatTime'
+
 import {Link} from 'dva/router'
+import VotesList from '../components/VotesList'
 
 const Game_comment_parent_container = styled.div`
     width: 100%;
@@ -25,7 +27,6 @@ const User_img = styled.div`
         border-radius:100%;
     }
 `
-
 const Comment_meta = styled.div`
     width:calc(100% - 120px) ;
     padding-right:40px;
@@ -156,7 +157,6 @@ class CommentList extends React.Component {
     postComemnt(value,permlink){
         const {author}=this.props.props
         const {privePostingWif,userName}=this.props.users.loginUserMeta
-        
         if(!privePostingWif){
           return message.warning('请先登陆');
         }
@@ -232,7 +232,7 @@ class CommentList extends React.Component {
         }
     }
     render(){
-        const {body,replies,created,author,active_votes,id,permlink,child,reward} = this.props.props
+        const {body,replies,created,author,active_votes,cashout_time,id,permlink,child,reward} = this.props.props
         const {userName} = this.props.users.loginUserMeta
         const {allComment,accounts} = this.props
         const {isIgore,isFollow} = this.state
@@ -249,7 +249,6 @@ class CommentList extends React.Component {
                         <Button onClick={()=>this.cancleShield(author)}>取消屏蔽</Button>
                         :<Button onClick={()=>this.Shield(author)}>屏蔽</Button>
                     }
-                  
                 </PopovercontentContainer>
             )
         }
@@ -297,15 +296,24 @@ class CommentList extends React.Component {
                                             onClick={()=>this.vote(permlink,author)}
                                             style={{background:"#ff605f",color:"#fff"}} 
                                             size='small'>点赞
-                                          </Button> 
-                                          <span style={{color:"#d46e00"}}>{reward}</span>
+                                          </Button>
+                                          <Popover placement="bottomLeft" title={null} content={`${timeDifference(cashout_time)}${reward}`} trigger="click">
+                                            <span style={{color:"#d46e00"}}>{reward}</span><Icon type="caret-down" style={{fontSize:"12px"}} theme="outlined" />
+                                          </Popover>
                                         </Oper_button>
-                                        <Oper_button>
-                                          <span 
-                                            style={{background:"#fff",color:"#666"}} 
-                                            size='small'>投票
-                                          </span> ({active_votes.length})
-                                        </Oper_button>
+                                        {
+                                            active_votes.length==0
+                                            ?null
+                                            : <Oper_button>
+                                            <Popover placement="bottomLeft" title={null} content={<VotesList active_votes={active_votes}/>} trigger="click">
+                                                {active_votes.length}
+                                                <span 
+                                                    style={{background:"#fff",color:"#666"}} 
+                                                    size='small'>个投票<Icon type="caret-down" style={{fontSize:"12px"}} theme="outlined" />
+                                                </span> 
+                                            </Popover>
+                                            </Oper_button>
+                                        }
                                         <Oper_button onClick={()=>this.changeShow(true)}>
                                             <Button 
                                               style={{background:"#e2e2e2",color:"#666"}} 

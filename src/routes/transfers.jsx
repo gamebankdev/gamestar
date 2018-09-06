@@ -230,7 +230,7 @@ class Transfers extends React.Component{
                         <div>
                             <span>{post_count||0}</span>
                             <br/>
-                            <span>帖子</span>
+                            <span>动态</span>
                         </div>
                         <div>
                             <span>{following_count}</span>

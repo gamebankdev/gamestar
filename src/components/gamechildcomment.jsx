@@ -1,9 +1,10 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Popover,Button } from 'antd';
+import { Popover,Button,Icon } from 'antd';
 import {connect} from 'dva'
 import {Link} from 'dva/router'
-import formtTime from '../utils/formatTime'
+import formtTime ,{timeDifference}  from '../utils/formatTime'
+import VotesList from '../components/VotesList'
 const Game_comment_child_container = styled.div`
     width: 100%;
     display:flex;
@@ -135,7 +136,7 @@ class Gamechildcomment extends React.Component{
         }
     }
     render(){
-        const {body,created,author,active_votes,replies,reward,permlink} = this.props.prop
+        const {body,created,author,active_votes,cashout_time,replies,reward,permlink} = this.props.prop
         const {follow,vote,cancleShield,canclefollow,Shield,accounts} = this.props
         const {isIgore,isFollow} = this.state
         const {userName} = this.props.users.loginUserMeta
@@ -197,14 +198,23 @@ class Gamechildcomment extends React.Component{
                                             style={{background:"#ff605f",color:"#fff"}} 
                                             size='small'>点赞
                                           </Button> 
-                                          <span style={{color:"#d46e00"}}>{reward}</span>
+                                          <Popover placement="bottomLeft" title={null} content={`${timeDifference(cashout_time)}${reward}`} trigger="click">
+                                            <span style={{color:"#d46e00"}}>{reward}</span><Icon type="caret-down" style={{fontSize:"12px"}} theme="outlined" />
+                                          </Popover>
                                         </Oper_button>
-                                        <Oper_button>
-                                          <span 
-                                            style={{color:"#666"}} 
-                                          >投票
-                                          </span> ({active_votes.length})
-                                        </Oper_button>
+                                        {
+                                            active_votes.length==0
+                                            ?null
+                                            : <Oper_button>
+                                            <Popover placement="bottomLeft" title={null} content={<VotesList active_votes={active_votes}/>} trigger="click">
+                                                {active_votes.length}
+                                                <span 
+                                                    style={{color:"#666"}} 
+                                                    size='small'>个投票<Icon type="caret-down" style={{fontSize:"12px"}} theme="outlined" />
+                                                </span> 
+                                            </Popover>
+                                            </Oper_button>
+                                        }
                                         <Oper_button onClick={()=>this.props.showRepalyEditor(true)}>
                                             <Button 
                                               style={{background:"#e2e2e2",color:"#666"}} 

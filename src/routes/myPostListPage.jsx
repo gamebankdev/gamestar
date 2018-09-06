@@ -40,13 +40,17 @@ class MyPostList extends React.Component{
     componentDidMount(){
         this.props.getAccountPost()
     }
+    componentWillReceiveProps(nextProps){
+       if(nextProps.games.length==0){
+           
+       }
+    }
     handleChange=(page, pageSize)=>{
         this.setState({
             SectionStart:page*10-10,
             SectionEnd:10*page
         })
     }
-
     render(){
         const {posts} =this.props;
         return(
@@ -61,7 +65,7 @@ class MyPostList extends React.Component{
                                   key={index} 
                                   {...Item}
                             >
-                                <Post_title>专业推荐</Post_title>
+                                <Post_title>{Item.gameName}</Post_title>
                                 <div dangerouslySetInnerHTML={{__html:Item.body}}></div>
                             </ListContaniner>
                         ) 
@@ -85,7 +89,10 @@ class MyPostList extends React.Component{
     }
 }
 const mapStateToProps = (state) => {
-    return {posts:state.accounts.Posts.content}
+    return {
+        posts:state.accounts.Posts.content,
+        games:state.games.gameList
+    }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
     return {

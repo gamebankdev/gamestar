@@ -113,10 +113,10 @@ class Deatail extends React.Component{
         if(!privePostingWif){
             return message.warning('请先登陆');
         }
+        const {gameName} = this.props.gamesDetail
         const {id} = this.props.match.params
-        this.props.postComment([privePostingWif,'',id, userName, new Date().getTime().toString(),new Date().getTime().toString(), value, {tags:[id]}])        
+        this.props.postComment([privePostingWif,'',id, userName, new Date().getTime().toString(),new Date().getTime().toString(), value, {tags:[id,gameName]}])        
     }
-
     changePagination=(page,pageSize)=>{
         this.setState({
             SectionStart:page*10-10,
@@ -202,7 +202,7 @@ class Deatail extends React.Component{
     }   
 }
 const mapStateToProps = (state, ownProps) => {
-    console.log("state",state)
+
     return {...state.users,...state.games}
 }
 const mapDispatchToProps = (dispatch, ownProps) => {

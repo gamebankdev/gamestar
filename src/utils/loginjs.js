@@ -56,15 +56,12 @@ const login = (payload,loginResult)=>{
                 passwordType='master'
             } 
             isvalid = gameStar.auth.wifIsValid(postingPriWif, pubPostingWif);
-            console.log("isvalid1",isvalid)
+         
             isvalid = gameStar.auth.wifIsValid(activePriWif, activePubWif);
-            console.log("isvalid2",isvalid)
+           
             isvalid = gameStar.auth.wifIsValid(ownerPriWif, ownerPubWif);
-            console.log("isvalid3",isvalid)
-            console.log("memoPubwif",memoPubwif)
-            console.log("memoPubkey",memoPubkey)
             isvalid = gameStar.auth.wifIsValid(memoPubwif, memoPubkey);
-            console.log("isvalid",isvalid)
+            
             if(isvalid){
                 resolve({
                     isLogin:isvalid,

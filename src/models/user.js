@@ -56,7 +56,7 @@ export default {
                 throw '用户名不存在!'
             }
             const result  = yield  call(Loginjs,payload,loginResult)
-            console.log("result",result)
+
             if(result.passwordType=='posting'||result.passwordType=='master'){
                 const obj=JSON.stringify({
                     isLogin:result.isLogin,
@@ -168,7 +168,7 @@ export default {
             throw '用户未注册'
         }
         const result  = yield  call(Loginjs,payload,loginResult)
-        console.log("result",result)
+ 
         if(result.passwordType!=='active' || result.passwordType!=='master'){
            
             yield put({

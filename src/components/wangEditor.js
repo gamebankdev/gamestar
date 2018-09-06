@@ -84,9 +84,7 @@ class WangEditor extends React.Component{
                     replay=='posts'? <Post_posts_comment onClick={()=>this.postComment()}>发布</Post_posts_comment>
                     : <Post_comment_comment onClick={()=>this.postComment()}>发布</Post_comment_comment>
                 }
-            </Post_menu>
-
-          
+            </Post_menu>          
         ]
     }
 }

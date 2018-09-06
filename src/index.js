@@ -6,7 +6,7 @@ import {message} from 'antd'
 // 1. Initialize
 const app = dva({
     onError(e,dispatch){
-        console.log(e)
+
         message.error(e.message)
     },
     history:createHistory({
@@ -14,6 +14,7 @@ const app = dva({
     })
 
 });
+
 // 2. Plugins
 // app.use({});
 // 3. Model
