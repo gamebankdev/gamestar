@@ -73,7 +73,7 @@ export default {
                 })
                 yield put(routerRedux.push("/"))
             }else{
-                throw '请输入posting或主密码'
+                throw '请输入注册密码或发帖私钥或主私钥'
             }
         }catch(err){
             throw err

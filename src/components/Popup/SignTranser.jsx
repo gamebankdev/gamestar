@@ -72,7 +72,7 @@ class SignTranser   extends React.Component{
                             <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
                         )}
                         </FormItem>
-                        <p>此操作需要您的Active或者主密码</p>
+                        <p>此操作需要您的资产或者账号主密码</p>
                         <FormItem>
                         <Button
                             type="primary"

@@ -89,7 +89,7 @@ class Login extends Component{
                   {getFieldDecorator('password', {
                     rules: [{ required: true, message: '请输入密码!' }],
                     })(
-                      <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="请输入posting或主密码" />
+                      <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="请输入注册密码或发帖私钥或主私钥" />
                     )}
                 </FormItem>
                 <br/>
