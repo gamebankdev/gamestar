@@ -136,7 +136,7 @@ class Gamechildcomment extends React.Component{
         }
     }
     render(){
-        const {body,created,author,active_votes,cashout_time,replies,reward,permlink} = this.props.prop
+        const {body,created,author,active_votes,cashout_time,replies,id,reward,permlink} = this.props.prop
         const {follow,vote,cancleShield,canclefollow,Shield,accounts} = this.props
         const {isIgore,isFollow} = this.state
         const {userName} = this.props.users.loginUserMeta
@@ -194,7 +194,8 @@ class Gamechildcomment extends React.Component{
                                     <div>
                                         <Oper_button>
                                           <Button
-                                            onClick={()=>vote(permlink,author)}
+                                            onClick={()=>vote(permlink,author,id)}
+                                            loading={this.props.voteIdIng==`${id}b`}
                                             style={{background:"#ff605f",color:"#fff"}} 
                                             size='small'>点赞
                                           </Button> 
@@ -231,5 +232,8 @@ class Gamechildcomment extends React.Component{
 
 
 export default connect(state=>{
-       return {users:state.users} 
+       return {
+           users:state.users,
+           voteIdIng:state.posts.voteIdIng
+        } 
     })(Gamechildcomment) 

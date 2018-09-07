@@ -8,26 +8,58 @@ const UserWallet__balance = styled.div`
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:20px 0;
-  
+  padding:20px 0; 
 `
-
 class Balance extends React.Component{
     constructor(props){
         super(props)
         this.state={
-            needTransfer:false
+            needTransfer:false,
+            ModalTitle:'转账',
+            modalNote:'将资金转移给另一个用户。',
+            type:'transfer'
         }
     }
     render(){
         const GBCoinMenu = (
             <Menu>
-              <Menu.Item key="0">
-                <span onClick={()=>this.setState({ needTransfer:true})}>转账</span>
+              <Menu.Item 
+                key="0" 
+                onClick={()=>this.setState({ 
+                    needTransfer:true,
+                    ModalTitle:'转账',
+                    modalNote:'将资金转移给另一个用户。',
+                    type:'transfer'
+                })}>
+                <span>转账</span>
+              </Menu.Item>
+              <Menu.Item 
+                key="1" 
+                onClick={()=>this.setState({ 
+                    needTransfer:true,
+                    ModalTitle:'转换成GBP',
+                    modalNote:'GBP是不可转让的，需要3个月才可全部换回GB(需13次转换)',
+                    type:'powerUp'
+                })}>
+                <span>power Up</span>
               </Menu.Item>
             </Menu>
           );
-        const {balance,gbd_balance,gameStar_power,userName,isLogin} = this.props
+          const GBPoinMenu = (
+            <Menu>
+              <Menu.Item 
+                key="0" 
+                onClick={()=>this.setState({ 
+                    needTransfer:true,
+                    ModalTitle:'转换成GBC',
+                    modalNote:'',
+                    type:'powerDown'
+                })}>
+                <span>power Down</span>
+              </Menu.Item>
+            </Menu>
+          );
+        const {balance,gbd_balance,gameStar_power,vesting_shares,userName,isLogin} = this.props
 
         const routerUserName=this.props.match.params.userName
         return (
@@ -38,15 +70,15 @@ class Balance extends React.Component{
                         <div style={{fontSize:'12px'}}>可交易代币,也可以转换成GBP</div>
                     </div>
                     {
-                      routerUserName==userName? 
-                        <div>
+                      routerUserName!=userName
+                      ?<div style={{cursor:'pointer', color:'#ff605f'}}>{balance}</div>
+                      : <div>
                           <Dropdown overlay={GBCoinMenu} trigger={['click']}>
                             <div style={{cursor:'pointer', color:'#ff605f'}}>
                             {balance} <Icon type="down" />
                             </div>
                           </Dropdown>
                         </div>
-                        :<div style={{cursor:'pointer', color:'#ff605f'}}>{balance}</div>
                     }
               </UserWallet__balance>
              <UserWallet__balance>
@@ -56,22 +88,26 @@ class Balance extends React.Component{
                     <br/> </div>
                 </div>
                 {
-                    routerUserName==userName?  
-                    <div>
-                        <div style={{cursor:'pointer', color:'#ff605f'}}>
-                            {gameStar_power}
-                        </div>
-                    </div> 
-                    : <div style={{cursor:'pointer', color:'#ff605f'}}>
-                            {gameStar_power}
-                        </div>
+                  routerUserName!=userName
+                  ?<div style={{cursor:'pointer', color:'#ff605f'}}>{vesting_shares}</div>
+                  : <div>
+                    <Dropdown overlay={GBPoinMenu} trigger={['click']}>
+                      <div style={{cursor:'pointer', color:'#ff605f'}}>
+                        {vesting_shares} <Icon type="down" />
+                      </div>
+                    </Dropdown>
+                    </div>
                 } 
               </UserWallet__balance>
         <TransferToAccountModal
-                {...{userName,balance,gbd_balance,isLogin}} 
+                {...{userName,balance,gbd_balance,isLogin,vesting_shares}} 
                 needTransfer={this.state.needTransfer}
+                type={this.state.type}
+                titile={this.state.ModalTitle}
                 cancle={()=>this.setState({needTransfer:false})}
-        />
+        >
+        <p>{this.state.modalNote}</p>
+        </TransferToAccountModal>
      </div>
         )
     }

@@ -58,7 +58,7 @@ class MyListContainer extends React.Component{
     }
     render(){
         const {author,created,active_votes,cashout_time,reward,replies,pending_payout_value} = this.props
-        console.log(this.props)
+
         return(
              <Post_key_container>
                     <Post_user>
@@ -91,7 +91,7 @@ class MyListContainer extends React.Component{
                             :null
                         }
                       </Oper_button>
-                      <Oper_button onClick={()=>this.changeShow(true)}>
+                      <Oper_button>
                         <Button 
                           style={{background:"#e2e2e2",color:"#666"}} 
                           size='small'>回复

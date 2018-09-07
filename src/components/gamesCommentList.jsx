@@ -145,12 +145,16 @@ class CommentList extends React.Component {
         })
     }
     /* 点赞 */
-    vote=(permlink,author)=>{
+    vote=(permlink,author,id)=>{
+
         const {privePostingWif,userName}=this.props.users.loginUserMeta
         if(!privePostingWif){
             return message.warning('请先登陆');
         }
-        this.props.postVote([privePostingWif,userName,author,permlink,10000])
+        this.props.postVote({
+            data:[privePostingWif,userName,author,permlink,10000],
+            id:`${id}b`
+        })
     }
 
     /* 提交评论 */
@@ -233,8 +237,10 @@ class CommentList extends React.Component {
     }
     render(){
         const {body,replies,created,author,active_votes,cashout_time,id,permlink,child,reward} = this.props.props
+   
         const {userName} = this.props.users.loginUserMeta
         const {allComment,accounts} = this.props
+
         const {isIgore,isFollow} = this.state
         const Popovercontent = (author)=>{
             return(
@@ -292,8 +298,8 @@ class CommentList extends React.Component {
                                     <div>
                                         <Oper_button>
                                           <Button
-                                            loading={this.state.voteLoading}
-                                            onClick={()=>this.vote(permlink,author)}
+                                            onClick={()=>this.vote(permlink,author,id)}
+                                            loading={this.props.voteIdIng==`${id}b`}
                                             style={{background:"#ff605f",color:"#fff"}} 
                                             size='small'>点赞
                                           </Button>
@@ -328,7 +334,7 @@ class CommentList extends React.Component {
                                               key={index} 
                                               prop={item} 
                                               accounts={accounts}
-                                              vote={(permlink,author)=>this.vote(permlink,author)}
+                                              vote={(permlink,author,id)=>this.vote(permlink,author,id)}
                                               cancleShield={(author)=>this.cancleShield(author)}
                                               Shield={(author)=>this.Shield(author)}
                                               follow={(author)=>this.follow(author)}
@@ -362,7 +368,7 @@ class CommentList extends React.Component {
                                         <ReplayEditor>
                                           <Wangeditor 
                                             key={id}
-                                            id={id}
+                                            id={id+'a'}
                                             permlink={permlink}
                                             Initialcontent={`回复${author}`}
                                             postComemnt={(value,permlink)=>this.postComemnt(value,permlink)}
@@ -379,7 +385,8 @@ class CommentList extends React.Component {
 const mapStateToProps = (state) => {
     return {
         allComment:state.games.gamesComment,
-        users:state.users
+        users:state.users,
+        voteIdIng:state.posts.voteIdIng
     }
 }
 const mapDispatchToProps = (dispatch) => {

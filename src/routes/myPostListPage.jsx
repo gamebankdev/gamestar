@@ -65,7 +65,7 @@ class MyPostList extends React.Component{
                                   key={index} 
                                   {...Item}
                             >
-                                <Post_title>{Item.gameName}</Post_title>
+                                <Post_title>{Item.game_name}</Post_title>
                                 <div dangerouslySetInnerHTML={{__html:Item.body}}></div>
                             </ListContaniner>
                         ) 

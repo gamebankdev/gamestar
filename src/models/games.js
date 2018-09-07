@@ -28,7 +28,6 @@ export default {
                     gameid:gameId
                 }
             })
-         
             yield put({
                 type:'getGameComment',
                 gameId

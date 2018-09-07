@@ -56,7 +56,7 @@ export default {
                 throw '用户名不存在!'
             }
             const result  = yield  call(Loginjs,payload,loginResult)
-
+   
             if(result.passwordType=='posting'||result.passwordType=='master'){
                 const obj=JSON.stringify({
                     isLogin:result.isLogin,
@@ -90,7 +90,7 @@ export default {
                 }
             }  
         })
-        yield put(routerRedux.push("/"))
+        window.location.href='/'
       },
       //获取屏蔽的人
       *getFollowingMethod({limit},{call,put,select}){
@@ -168,9 +168,7 @@ export default {
             throw '用户未注册'
         }
         const result  = yield  call(Loginjs,payload,loginResult)
- 
-        if(result.passwordType!=='active' || result.passwordType!=='master'){
-           
+        if(result.passwordType=='active' || result.passwordType=='master'){
             yield put({
                 type:'save',
                 payload:{

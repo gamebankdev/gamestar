@@ -18,7 +18,6 @@ export default {
             following_count:0,
             follower_count:0
         },
-        
         userAccounts:{
             active:{
                 key_auths:[]
@@ -137,6 +136,7 @@ export default {
             method:'POST',
             payload:[payload]
         })
+
         yield put({
             type:'save',
             payload:{

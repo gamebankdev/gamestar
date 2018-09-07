@@ -151,8 +151,7 @@ class Transfers extends React.Component{
         const customJson = JSON.stringify(followReq)
         this.props.postUserOper([privePostingWif, [], [userName], 'follow', customJson])
     }
-    componentWillReceiveProps(nextProps){
- 
+    async componentWillReceiveProps (nextProps){
         const {ignore,folloing,changeAvterSuccess} = nextProps
         if(changeAvterSuccess){
             this.setState({
@@ -163,33 +162,33 @@ class Transfers extends React.Component{
                 visible:true
             })
         }
-
         if(folloing.length==0 &&ignore.length==0 ){
             this.setState({
-            isFollw:false,
-            isShield:false
+             isFollw:false,
+             isShield:false
             })
-        }  
+        }
         if(ignore.length>0){
-            ignore.map(item=>{
-                if(item.follower == this.props.loginUserMeta.userName){
-                   this.setState({
-                        isShield:true,
-                        isFollw:false
-                   })
-                }
+            var isignore=false
+           await ignore.map((item,index)=>{
+                if(item.following ==this.props.match.params.userName){
+                    isignore=true
+              } 
             })
+            isignore?this.setState({isShield:true,isFollw:false}): this.setState({isShield:false})
         }
         if(folloing.length>0){
-            folloing.map(item=>{
-                if(item.follower == this.props.loginUserMeta.userName){
-                    this.setState({
-                        isFollw:true,
-                        isShield:false
-                   })
+            let isFollw=false
+            await folloing.map(item=>{
+                if(item.following == this.props.match.params.userName){
+                    isFollw=true
                 }
             })
+            isFollw?this.setState({isFollw:true,isShield:false}):this.setState({isFollw:false})
+        }else{
+            this.setState({isFollw:false})
         }
+      
     }
     render(){ 
         const loginUserName = this.props.loginUserMeta.userName
@@ -223,7 +222,7 @@ class Transfers extends React.Component{
                     <span>{fomatTime(created)}加入</span>
                     <Person_meta>
                         <div>
-                            <span>{follower_count}</span>
+                            <span>{following_count}</span>
                             <br/>
                             <span>关注</span> 
                         </div>
@@ -233,7 +232,7 @@ class Transfers extends React.Component{
                             <span>动态</span>
                         </div>
                         <div>
-                            <span>{following_count}</span>
+                            <span>{follower_count}</span>
                             <br/>
                             <span>被关注</span>
                         </div>
@@ -309,7 +308,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
     return {
         getUser:()=>{
-
             dispatch({
                 type:'accounts/getUserMeta',
                 payload:ownProps.match.params.userName

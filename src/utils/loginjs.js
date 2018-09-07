@@ -25,24 +25,25 @@ const login = (payload,loginResult)=>{
             memoPubkey = loginResult[0].memo_key
             // 如果输入的密码是私钥
             if(isWif){
-                if(gameStar.auth.wifIsValid(password,pubPostingWif)){
-                    postingPriWif=password;
-                    passwordType='posting',
-                    isvalid==true
-                }else if(gameStar.auth.wifIsValid(password,activePubWif)){
+                if(gameStar.auth.wifIsValid(password, activePubWif)){
                     activePriWif=password;
                     passwordType='active';
+                    isvalid==true
+                }else if(gameStar.auth.wifIsValid(password,pubPostingWif)){
+                    postingPriWif=password;
+                    passwordType='posting',
                     isvalid==true
                 }else{
                     passwordType='error'
                     isvalid==false
                 }
+
                 resolve({
                         isLogin:isvalid,
                         userName:payload.userName,
                         passwordType,
-                        postingPriWif,
-                        activePriWif,
+                        privePostingWif:postingPriWif,
+                        activePriWif:activePriWif,
                         memo_key:memoPubkey
                     })
                 
@@ -55,10 +56,9 @@ const login = (payload,loginResult)=>{
                 memoPubwif=PrivateKeys.memo
                 passwordType='master'
             } 
+
             isvalid = gameStar.auth.wifIsValid(postingPriWif, pubPostingWif);
-         
             isvalid = gameStar.auth.wifIsValid(activePriWif, activePubWif);
-           
             isvalid = gameStar.auth.wifIsValid(ownerPriWif, ownerPubWif);
             isvalid = gameStar.auth.wifIsValid(memoPubwif, memoPubkey);
             

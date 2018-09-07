@@ -3,21 +3,27 @@ import {message} from 'antd'
 export default {
     namespace:'posts',
     state:{
-
+        voteIdIng:false,
     },
     effects:{
         //点赞
         *postVote({payload},{call,put,select}){
-
-            yield call(fetchUrl,'broadcast/vote',{
-                method:'POST',
-                payload:payload
-            })
-            const {gameId} = yield select(state=>state.games)
-            yield put({
-                type:'games/getGameComment',
-                gameId
-            })
+            try{
+                yield put({type:"save",payload:{voteIdIng:payload.id}})
+                yield call(fetchUrl,'broadcast/vote',{
+                    method:'POST',
+                    payload:payload.data
+                })
+                yield put({type:"save",payload:{voteIdIng:false}})
+                const {gameId} = yield select(state=>state.games)
+                yield put({
+                    type:'games/getGameComment',
+                    gameId
+                })
+            }catch(err){
+                yield put({type:"save",payload:{voteIdIng:false}})
+                message.error(err)
+            }
         },
         //发表评论
         *PostComment({payload},{call,put,select}){
@@ -61,7 +67,9 @@ export default {
         },
     },
     reducers:{
-        
+        save(state, action) {
+            return { ...state, ...action.payload };
+          },
     }
 
 }

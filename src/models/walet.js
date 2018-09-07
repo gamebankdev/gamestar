@@ -16,6 +16,7 @@ export default {
                 key_auths:[[0]]
             }
         },
+        requestPowerUp:false
     },
     subscriptions: {},
     effects: {
@@ -30,15 +31,16 @@ export default {
             payload:[]
         })
         ]
-    //    计算账户gameStarPower和账户公钥
+    //    计算账户gameStarPower 和 账户公钥
        const gameStarPower=yield call(getgameStarPower,result,userName,properties)
-
        yield put({ type: 'save',payload:{userState:{...result[0],...gameStarPower}}});
 
       },
+      
       *Transfer({payload},{call,put,select}){
           // 验证是否转账权限
         const {activePriWif,userName} = yield select(state=>state.users.loginUserMeta)
+        
         if(!activePriWif){
            return yield put({
                 type:'global/showSignModal',  
@@ -64,6 +66,61 @@ export default {
             description: '转账成功',
           });
       },
+      *powerUp({payload},{call,put,select}){
+           const {activePriWif,userName} = yield select(state=>state.users.loginUserMeta)
+           if(!activePriWif){
+              return yield put({
+                   type:'global/showSignModal',  
+                   payload:{
+                       doingTask:'walet/powerUp',
+                       doingParams:payload
+                   }
+               })
+           }
+           try{
+            payload.unshift(activePriWif)
+            yield put({type:"save",payload:{requestPowerUp:'ing'}})
+            yield call(fetchUrl,'broadcast/transferToVesting',{method:"POST",payload})
+            yield put({type:"fetchUserWalet",payload:{userName}})
+            yield put({type:"save",payload:{requestPowerUp:'success'}})
+            notification.open({
+              message: 'power Up',
+              description: 'power Up 成功',
+             });
+             yield put({type:"save",payload:{requestPowerUp:false}})
+           }catch(err){
+             yield put({type:"save",payload:{requestPowerUp:'failer'}})
+             throw err
+           }
+       },
+       *WithdrawVesting({payload},{call,put,select}){
+        const {activePriWif,userName} = yield select(state=>state.users.loginUserMeta)
+           if(!activePriWif){
+              return yield put({
+                   type:'global/showSignModal',  
+                   payload:{
+                       doingTask:'walet/WithdrawVesting',
+                       doingParams:payload
+                   }
+               })
+           }
+           try{
+            payload.unshift(activePriWif)
+            yield put({type:"save",payload:{requestPowerUp:'ing'}})
+            yield call(fetchUrl,'broadcast/withdrawVesting',{method:"POST",payload})
+            yield put({type:"fetchUserWalet",payload:{userName}})
+            yield put({type:"save",payload:{requestPowerUp:'success'}})
+            notification.open({
+              message: 'power Down',
+              description: 'power Down 成功,本次交易将分13周转移转移到你的账户',
+              });
+             yield put({type:"save",payload:{requestPowerUp:false}})
+           }catch(err){
+             yield put({type:"save",payload:{requestPowerUp:'failer'}})
+             throw err
+        }
+       }
+
     },
     reducers: {
       save(state, action) {

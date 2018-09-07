@@ -1,6 +1,8 @@
 import React from 'react'
 import E from 'wangeditor'
 import { Button,message } from 'antd';
+
+
 import styled from 'styled-components'
 const Post_menu  = styled.div`
     width:100% ;
@@ -46,7 +48,6 @@ class WangEditor extends React.Component{
         this.editor = new E(`#toolbar${id}`,`#EditorArea${id}`)  
         this.editor.customConfig.onchangeTimeout = 1000
         this.editor.customConfig.menus = [
-            'link',  // 插入链接
             'emoticon',  // 表情
             'image',  // 插入图片
         ]
@@ -76,8 +77,10 @@ class WangEditor extends React.Component{
     render(){
         const {id,replay}=this.props;
         return[
-            <EditorArea id={`EditorArea${id}`} className="text" placeholder="1"></EditorArea>,
-            <Post_menu>
+            <EditorArea key={1} id={`EditorArea${id}`} className="text" placeholder="1"></EditorArea>,
+
+            <Post_menu key={2}>
+
                 <div id={`toolbar${id}`} className="toolbar">
                 </div>
                 {
