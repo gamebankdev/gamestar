@@ -4,12 +4,28 @@ import styled from 'styled-components'
 import {Button ,Divider,Icon} from 'antd';
 import {  Route} from 'dva/router';
 import {connect} from 'dva'
-import ChangeAvterModal from '../components/Popup/ChangeAvterModal'
-import Walet from './walet'
-import PostList from './myPostListPage'
-import Comment from './MyCommentsPage'
-import MyLeaveMessage from './MyLeaveMessage'
 import fomatTime from '../utils/formatTime'
+
+import Walet from './walet'
+
+import ChangeAvterModal from '../components/Popup/ChangeAvterModal'
+import dynamic from 'dva/dynamic';
+const PostList=dynamic({
+    component:()=>import('./myPostListPage')
+  })
+const Comment=dynamic({
+    component:()=>import('./MyCommentsPage')
+})
+const MyLeaveMessage=dynamic({
+    component:()=>import('./MyLeaveMessage')
+})
+const Followings=dynamic({
+    component:()=>import('./MyFollowings')
+})
+const Followers=dynamic({
+    component:()=>import('./MyFollowers')
+})
+
 const Container = styled.div`
     width: 100%;
     background:#fff;
@@ -108,7 +124,6 @@ const Content_container= styled.div`
 
 class Transfers extends React.Component{
     constructor(props){
- 
         super(props)
         this.state={
             isFollw:false,
@@ -152,6 +167,9 @@ class Transfers extends React.Component{
         this.props.postUserOper([privePostingWif, [], [userName], 'follow', customJson])
     }
     async componentWillReceiveProps (nextProps){
+        if(this.props.match.params.userName!==nextProps.match.params.userName){
+           return nextProps.getUser()
+        }
         const {ignore,folloing,changeAvterSuccess} = nextProps
         if(changeAvterSuccess){
             this.setState({
@@ -222,7 +240,9 @@ class Transfers extends React.Component{
                     <span>{fomatTime(created)}加入</span>
                     <Person_meta>
                         <div>
-                            <span>{following_count}</span>
+                             <Link title={`关注了${following_count}个人`} style={{color:"#333"}} to={`/users/${userName}/following`}>
+                              {following_count}
+                             </Link>
                             <br/>
                             <span>关注</span> 
                         </div>
@@ -232,7 +252,9 @@ class Transfers extends React.Component{
                             <span>动态</span>
                         </div>
                         <div>
-                            <span>{follower_count}</span>
+                            <Link title={`${follower_count}个人关注了`} style={{color:"#333"}} to={`/users/${userName}/followers`}>
+                              {follower_count}
+                             </Link>
                             <br/>
                             <span>被关注</span>
                         </div>
@@ -263,7 +285,6 @@ class Transfers extends React.Component{
                             }
                          </Folle_igore_container>
                     } 
-                  
                 </User_meta_comtainer>
                 </div>
                 <Divider />
@@ -292,10 +313,11 @@ class Transfers extends React.Component{
                     <Route path='/users/:userName/messages' component={MyLeaveMessage}/>
                     <Route path='/users/:userName/comments' component={Comment}/>
                     <Route path='/users/:userName/walet' component={Walet}/>
+                    <Route path='/users/:userName/following' component={Followings}/>
+                    <Route path='/users/:userName/followers' component={Followers}/>
                 </Content_container>
             </Container_content>
         </Container>
-
     )
  }
 }

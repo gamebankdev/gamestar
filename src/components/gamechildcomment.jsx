@@ -103,36 +103,36 @@ class Gamechildcomment extends React.Component{
         }
     }
       //触发Popover事件
-      PopoverCallback=(visible)=>{
+      PopoverCallback=async visible =>{
         if(visible){
             const {ignore,folloing} = this.props.users
             const {author} = this.props.prop
-            if(ignore.length==0){
+            if(folloing.length==0 &&ignore.length==0 ){
                 this.setState({
-                    isIgore:false
-                })
-            }else{
-                ignore.map(item=>{
-                    if(author==item.following){
-                        this.setState({
-                            isIgore:true
-                        })
-                    }
+                 isFollow:false,
+                 isIgore:false
                 })
             }
-            if(folloing.length==0){
-                this.setState({
-                    isFollow:false
+            if(ignore.length>0){
+                var isignore=false
+               await ignore.map((item,index)=>{
+                    if(item.following ==author){
+                        isignore=true
+                  } 
                 })
-            }else{
-                folloing.map(item=>{
-                    if(author==item.following){
-                        this.setState({
-                            isFollow:true
-                        })
+                isignore?this.setState({isIgore:true,isFollow:false}): this.setState({isIgore:false})
+            }
+            if(folloing.length>0){
+                let isFollow=false
+                await folloing.map(item=>{
+                    if(item.following == author){
+                        isFollow=true
                     }
                 })
-            }          
+                isFollow?this.setState({isFollow:true,isIgore:false}):this.setState({isFollow:false})
+            }else{
+                this.setState({isFollow:false})
+            }           
         }
     }
     render(){
@@ -175,7 +175,7 @@ class Gamechildcomment extends React.Component{
                                     </div>
                                     <div>
                                         {
-                                            userName==author?
+                                            userName &&(userName==author?
                                             <img src={require('../assets/coment_user_oper.png')} alt=""/>
                                             :
                                             <Popover  
@@ -185,7 +185,7 @@ class Gamechildcomment extends React.Component{
                                                 title={null}
                                             >
                                                 <img src={require('../assets/coment_user_oper.png')} alt=""/>
-                                            </Popover>
+                                            </Popover>)
                                         }
                                     </div>
                                 </Comment>

@@ -4,10 +4,16 @@ import { Menu } from 'antd';
 import { Route } from 'dva/router';
 import {connect} from 'dva'
 import styled from 'styled-components';
-
-import Balance from '../components/balance.jsx'
-import Permissions from '../components/permissions.jsx'
-import Repass from '../components/Repass.jsx'
+import dynamic from 'dva/dynamic';
+const Repass=dynamic({
+    component:()=>import('../components/Repass.jsx')
+})
+const Permissions=dynamic({
+  component:()=>import('../components/permissions.jsx')
+})
+const Balance=dynamic({
+  component:()=>import('../components/balance.jsx')
+})
 
 const Route_container = styled.div`
     padding:0 10px;

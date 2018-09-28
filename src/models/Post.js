@@ -28,6 +28,7 @@ export default {
         //发表评论
         *PostComment({payload},{call,put,select}){
             try{
+        
                 message.loading('正在请求!', 0);
                 yield call(fetchUrl,'broadcast/comment',{
                     method:'POST',
@@ -39,27 +40,34 @@ export default {
                     gameId
                 })
                 message.destroy()
+       
+
             }catch(err){
                 message.destroy()
-                throw err
+            
+              
+
+                throw `${err}`
             }
         },
         //关注某人
-        *UserOper({payload},{call,put}){
+        *UserOper({payload},{call,put,select}){
             try{
                 yield call(fetchUrl,'broadcast/customJson',{
                     method:'POST',
                     payload
                 })
+                const currentLoginUserName=yield select(state=>state.users.loginUserMeta.userName)
                 yield put({
-                    type:"users/getFollowingMethod",
-                    limit:20
+                    type:"users/getFollow",
+                    userName:currentLoginUserName,
+                    isloginUser:true,
                 })
                 yield put({
-                    type:"users/getFollowIgnore",
-                    limit:20
+                    type:"users/getIgnore",
+                    userName:currentLoginUserName,
+                    isloginUser:true,
                 })
-                
             }catch(err){
                 throw err
             }

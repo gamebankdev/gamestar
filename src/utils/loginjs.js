@@ -33,20 +33,18 @@ const login = (payload,loginResult)=>{
                     postingPriWif=password;
                     passwordType='posting',
                     isvalid==true
+                    
                 }else{
                     passwordType='error'
                     isvalid==false
                 }
-
                 resolve({
-                        isLogin:isvalid,
                         userName:payload.userName,
                         passwordType,
                         privePostingWif:postingPriWif,
                         activePriWif:activePriWif,
                         memo_key:memoPubkey
                     })
-                
             //如果输入的是主密码
             }else{
                const PrivateKeys = gameStar.auth.getPrivateKeys(userName,password, ['owner','active','posting','memo']);
@@ -64,7 +62,6 @@ const login = (payload,loginResult)=>{
             
             if(isvalid){
                 resolve({
-                    isLogin:isvalid,
                     userName:payload.userName,
                     passwordType,
                     privePostingWif:postingPriWif,
@@ -76,7 +73,6 @@ const login = (payload,loginResult)=>{
                 throw '密码错误'
             }
         }catch(err){
-          
            reject(err)
         }
     })

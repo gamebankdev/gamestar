@@ -5,12 +5,13 @@ import { Base64 } from 'js-base64';
 import Loginjs from '../utils/loginjs'
 import {message} from 'antd'
 const usermeta=window.localStorage.getItem('usermeta')?JSON.parse(Base64.decode(window.localStorage.getItem('usermeta'))):{}
-
 export default {
     namespace: 'users',
     state: {
         loginUserMeta:usermeta,
         folloing:[],
+        currentUserFollow:[],
+        currentUserfollowers:[],
         ignore:[],
         login_checkUserName_isHas:false,
         SuggestedPassword:'',
@@ -20,16 +21,38 @@ export default {
     subscriptions:{
         setup({ dispatch}) {
             dispatch({
-                type:'getFollowingMethod',
-                limit:20
+                type:'getFollow',
+                limit:1000,
+                userName:usermeta.userName,
+                isloginUser:true,
             }),
             dispatch({
-                type:'getFollowIgnore',
-                limit:20
+                type:'getIgnore',
+                limit:1000,
+                userName:usermeta.userName,
+                isloginUser:true,
             })
         },
     },
     effects: {
+      //验证缓存的数据是否正确
+        *checkLocal({},{call,put,select}){
+            const {userName} = yield select(state=>state.users.loginUserMeta)
+            try{
+                if(userName){
+                    yield put({
+                        type:"fetchLogin",
+                        payload:{
+                            userName:usermeta.userName,
+                            password:usermeta.privePostingWif,
+                        }
+                    })
+                }
+            }catch(err){
+                
+            }
+          
+        },
       //检查用户是否存在
         *checkUserName({userName},{call,put}){
             try{
@@ -56,10 +79,8 @@ export default {
                 throw '用户名不存在!'
             }
             const result  = yield  call(Loginjs,payload,loginResult)
-   
             if(result.passwordType=='posting'||result.passwordType=='master'){
                 const obj=JSON.stringify({
-                    isLogin:result.isLogin,
                     userName:result.userName,
                     privePostingWif:result.privePostingWif,
                     memo_key:result.memo_key
@@ -85,17 +106,14 @@ export default {
         yield put({
             type:"save",
             payload:{
-                loginUserMeta:{
-                    isLogin:false
-                }
+                loginUserMeta:{}
             }  
         })
         window.location.href='/'
       },
-      //获取屏蔽的人
-      *getFollowingMethod({limit},{call,put,select}){
+      //获取屏蔽
+      *getIgnore({limit=1000,userName,isloginUser},{call,put,select}){   
          try{
-            const {userName} = yield select(state=>state.users.loginUserMeta)
             if(!userName){
                 return;
             }
@@ -103,20 +121,20 @@ export default {
                 method:'POST',
                 payload:[userName,"",'ignore',limit]
             })
+            const payload=isloginUser?{
+                ignore:[...ignoreArray]
+            }:null
             yield put({
                 type:"save",
-                payload:{
-                    ignore:[...ignoreArray]
-                }
+                payload
             })
          }catch(err){
              throw err
          }
       },  
-      //获取关注的人
-      *getFollowIgnore({limit},{call,put,select}){
+      //获取关注
+      *getFollow({limit=1000,userName,isloginUser},{call,put,select}){
           try{
-            const {userName} = yield select(state=>state.users.loginUserMeta)
             if(!userName){
                 return;
             }
@@ -124,16 +142,35 @@ export default {
                 method:'POST',
                 payload:[userName,"",'blog',limit]
             })
+           let payload = isloginUser?{folloing:folloingArray}:{currentUserFollow:isloginUser?[]:folloingArray}
             yield put({
                 type:"save",
-                payload:{
-                    folloing:[...folloingArray]
-                }
+                payload
             })
           }catch(err){
               throw err
           }
      },  
+     //获取关注者
+     *getFollowers({limit=1000,userName,isloginUser},{call,put,select}){
+        try{
+          if(!userName){
+              return;
+          }
+          const FollowersArray = yield call(fetchUrl,'api/getFollowers',{
+              method:'POST',
+              payload:[userName,"",'blog',limit]
+          })
+          yield put({
+              type:"save",
+              payload:{
+                currentUserfollowers:FollowersArray
+              }
+          })
+        }catch(err){
+            throw err
+        }
+    },  
       //生成建议密码
       *CreateSuggestedPassword({},{call,put}){
             const password = gameStar.formatter.createSuggestedPassword();
@@ -186,7 +223,6 @@ export default {
         }else{
              throw '请使用avtive密码/或者主密码'
         }
-       
      },
      *changeAvter({payload},{call,put,select}){
           // 签名权限

@@ -41,9 +41,9 @@ class MyPostList extends React.Component{
         this.props.getAccountPost()
     }
     componentWillReceiveProps(nextProps){
-       if(nextProps.games.length==0){
-           
-       }
+        if(this.props.match.params.userName!==nextProps.match.params.userName){
+           return nextProps.getAccountPost()
+        }
     }
     handleChange=(page, pageSize)=>{
         this.setState({

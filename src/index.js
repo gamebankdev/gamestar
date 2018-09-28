@@ -1,20 +1,18 @@
 import dva from 'dva';
 import './index.css';
 import createHistory from 'history/createBrowserHistory';
-
+import gamebanek from 'gamebank'
 import {message} from 'antd'
+import errorFun from './utils/error'
 // 1. Initialize
 const app = dva({
-    onError(e,dispatch){
-
-        message.error(e.message)
-    },
     history:createHistory({
         basename:"/"
-    })
-
+    }),
+    onError(e){
+        message.error(errorFun(e.message))
+    },
 });
-
 // 2. Plugins
 // app.use({});
 // 3. Model

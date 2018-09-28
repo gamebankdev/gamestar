@@ -7,11 +7,9 @@ export default (time)=>{
     const year = newtimes.getFullYear()
     const month = newtimes.getMonth()+1
     const day = newtimes.getDate()
-    const hours  = newtimes.getHours()
-    const minuts  = newtimes.getMinutes()
-  
+    const hours  = newtimes.getHours()<10?'0'+newtimes.getHours():newtimes.getHours()
+    const minuts  = newtimes.getMinutes()<10?('0'+newtimes.getMinutes()):newtimes.getMinutes()
     return year+"-"+month+"-"+ day+"  "+hours+":"+minuts
-
 }
 export const timeDifference=(time)=>{
     const NowTimestamp=new Date().getTime()

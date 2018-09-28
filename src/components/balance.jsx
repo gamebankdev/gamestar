@@ -59,7 +59,7 @@ class Balance extends React.Component{
               </Menu.Item>
             </Menu>
           );
-        const {balance,gbd_balance,gameStar_power,vesting_shares,userName,isLogin} = this.props
+        const {balance,gbd_balance,vesting_shares,userName} = this.props
 
         const routerUserName=this.props.match.params.userName
         return (
@@ -100,7 +100,7 @@ class Balance extends React.Component{
                 } 
               </UserWallet__balance>
         <TransferToAccountModal
-                {...{userName,balance,gbd_balance,isLogin,vesting_shares}} 
+                {...{userName,balance,gbd_balance,vesting_shares}} 
                 needTransfer={this.state.needTransfer}
                 type={this.state.type}
                 titile={this.state.ModalTitle}

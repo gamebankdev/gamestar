@@ -46,7 +46,7 @@ class TransferInput extends React.Component{
     //验证转账数量是否足够
     validateCount(rule, value, callback){
         const Maxgbc=this.props.balance.split(' ')[0]
-        if((Maxgbc-value)<=0){
+        if((Maxgbc-value)<0){
             callback('余额不足')
         }else{
             callback()
@@ -101,10 +101,10 @@ class TransferInput extends React.Component{
     }
 }
 const WrappedNormalLoginForm = Form.create()(TransferInput);
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
     return { ...state.users }
 }
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps = (dispatch) => {
     return {
         Transfer: (payload) => {
             return new Promise((resolve,reject)=>{

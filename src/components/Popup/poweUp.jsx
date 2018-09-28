@@ -55,9 +55,9 @@ class PowerUp extends React.Component{
     validateCount(rule, value, callback){
         const Maxgbc=this.props.balance.split(' ')[0]
         const MaxGbp=this.props.vesting_shares.split(' ')[0]
-        if((Maxgbc-value)<=0 &&this.props.type=='powerUp'){
+        if((Maxgbc-value)<0 &&this.props.type=='powerUp'){
             callback('余额不足')
-        }else if((MaxGbp-value)<=0 &&this.props.type=='powerDown'){
+        }else if((MaxGbp-value)<0 &&this.props.type=='powerDown'){
             callback('余额不足')
         }else{
             callback()

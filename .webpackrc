@@ -2,5 +2,10 @@
   "extraBabelPlugins": [
     ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": "css" }]
   ],
-  "publicPath": "/"
+  "publicPath": "/",
+  "hash":true,
+  "html":{
+  "template": "./src/index.ejs",
+  "title": "gameStar"
+  }
 }
